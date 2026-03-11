@@ -1,0 +1,335 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="content-wrapper">
+    <!-- Fila 1: Overview Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stats-card">
+                <span class="stats-label">Total Profit</span>
+                <div class="stats-value">$95,595</div>
+                <div class="stats-trend">
+                    <span class="trend-up">+5.55%</span>
+                    <span class="text-muted">vs last month</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stats-card">
+                <span class="stats-label">Total Expenses</span>
+                <div class="stats-value">$12,789</div>
+                <div class="stats-trend">
+                    <span class="trend-up">+2.87%</span>
+                    <span class="text-muted">vs last month</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stats-card">
+                <span class="stats-label">New Users</span>
+                <div class="stats-value">1,984</div>
+                <div class="stats-trend">
+                    <span class="trend-neutral">+0.00%</span>
+                    <span class="text-muted">vs last month</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fila 2: Sales Report y Top Products -->
+    <div class="row g-4 mb-4">
+        <!-- Sales Report Chart -->
+        <div class="col-lg-7">
+            <div class="dashboard-card">
+                <h3 class="section-title">Sales Report</h3>
+                <div style="height: 250px;">
+                    <canvas id="salesChart"></canvas>
+                </div>
+                <div class="d-flex justify-content-center mt-3 text-muted small" style="gap: 2rem;">
+                    <span>22 Jan</span>
+                    <span>25 Jan</span>
+                    <span>28 Jan</span>
+                    <span>29 Jan</span>
+                    <span>30 Jan</span>
+                    <span>31 Jan</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Selling Products -->
+        <div class="col-lg-5">
+            <div class="dashboard-card">
+                <h3 class="section-title">Top Selling Product</h3>
+
+                <div class="product-item">
+                    <div class="product-info">
+                        <div class="product-image">
+                            <i class="bi bi-bag"></i>
+                        </div>
+                        <div>
+                            <div class="product-name">Adidas CI Sneaker</div>
+                        </div>
+                    </div>
+                    <div class="product-price">$2,230</div>
+                </div>
+
+                <div class="product-item">
+                    <div class="product-info">
+                        <div class="product-image">
+                            <i class="bi bi-bag"></i>
+                        </div>
+                        <div>
+                            <div class="product-name">Nike Men's Kapur Sneaker</div>
+                        </div>
+                    </div>
+                    <div class="product-price">$1,524</div>
+                </div>
+
+                <div class="product-item">
+                    <div class="product-info">
+                        <div class="product-image">
+                            <i class="bi bi-bag"></i>
+                        </div>
+                        <div>
+                            <div class="product-name">Adidas Women's Clari Sneaker</div>
+                        </div>
+                    </div>
+                    <div class="product-price">$998</div>
+                </div>
+
+                <div class="product-item">
+                    <div class="product-info">
+                        <div class="product-image">
+                            <i class="bi bi-bag"></i>
+                        </div>
+                        <div>
+                            <div class="product-name">ASICS Women's 7 Running Shoe</div>
+                        </div>
+                    </div>
+                    <div class="product-price">$786</div>
+                </div>
+
+                <div class="product-item">
+                    <div class="product-info">
+                        <div class="product-image">
+                            <i class="bi bi-bag"></i>
+                        </div>
+                        <div>
+                            <div class="product-name">Sofie Men's 3 Pack - USA Only</div>
+                        </div>
+                    </div>
+                    <div class="product-price">$566</div>
+                </div>
+
+                <div class="product-item">
+                    <div class="product-info">
+                        <div class="product-image">
+                            <i class="bi bi-bag"></i>
+                        </div>
+                        <div>
+                            <div class="product-name">Simple Joys by Carter's Skin</div>
+                        </div>
+                    </div>
+                    <div class="product-price">$323</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fila 3: Popular Categories y Upcoming Events -->
+    <div class="row g-4 mb-4">
+        <!-- Popular Categories -->
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h3 class="section-title">Popular Categories</h3>
+
+                <div class="category-item">
+                    <div class="category-name">
+                        <div class="category-color" style="background: #4361ee;"></div>
+                        <span>Shops</span>
+                    </div>
+                    <div class="category-value">$600</div>
+                </div>
+
+                <div class="category-item">
+                    <div class="category-name">
+                        <div class="category-color" style="background: #06d6a0;"></div>
+                        <span>Jacket</span>
+                    </div>
+                    <div class="category-value">$500</div>
+                </div>
+
+                <div class="category-item">
+                    <div class="category-name">
+                        <div class="category-color" style="background: #ffb703;"></div>
+                        <span>T-shirt</span>
+                    </div>
+                    <div class="category-value">$200</div>
+                </div>
+
+                <div class="category-item">
+                    <div class="category-name">
+                        <div class="category-color" style="background: #fb8500;"></div>
+                        <span>Other</span>
+                    </div>
+                    <div class="category-value">$110</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h3 class="section-title">Upcoming Events</h3>
+
+                <div class="event-item">
+                    <div class="event-date">
+                        <div class="event-day">10</div>
+                        <div class="event-month">JUL</div>
+                    </div>
+                    <div class="event-title">TUC Meeting with partners</div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-date">
+                        <div class="event-day">20</div>
+                        <div class="event-month">JUL</div>
+                    </div>
+                    <div class="event-title">MOU 103th Web Conference</div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-date">
+                        <div class="event-day">16</div>
+                        <div class="event-month">JUL</div>
+                    </div>
+                    <div class="event-title">TUC Launch with Steve</div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-date">
+                        <div class="event-day">27</div>
+                        <div class="event-month">JUL</div>
+                    </div>
+                    <div class="event-title">WSU Meeting with partners</div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-date">
+                        <div class="event-day">08</div>
+                        <div class="event-month">JUL</div>
+                    </div>
+                    <div class="event-title">TUC Weekly Meeting</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fila 4: Active Users -->
+    <div class="row">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="section-title mb-0">Active Users</h3>
+                    <div class="stats-value" style="font-size: 2rem;">8,200</div>
+                </div>
+
+                <!-- Barras del gráfico -->
+                <div class="active-users-chart">
+                    <div class="bar" style="height: 40px;"></div>
+                    <div class="bar" style="height: 65px;"></div>
+                    <div class="bar" style="height: 85px;"></div>
+                    <div class="bar" style="height: 70px;"></div>
+                    <div class="bar" style="height: 95px;"></div>
+                    <div class="bar" style="height: 80px;"></div>
+                    <div class="bar" style="height: 60px;"></div>
+                    <div class="bar" style="height: 75px;"></div>
+                    <div class="bar" style="height: 90px;"></div>
+                    <div class="bar" style="height: 100px;"></div>
+                    <div class="bar" style="height: 85px;"></div>
+                    <div class="bar" style="height: 70px;"></div>
+                    <div class="bar" style="height: 55px;"></div>
+                </div>
+
+                <div class="d-flex justify-content-center mt-3 text-muted small" style="gap: 2rem;">
+                    <span>22 Jan</span>
+                    <span>25 Jan</span>
+                    <span>28 Jan</span>
+                    <span>29 Jan</span>
+                    <span>30 Jan</span>
+                    <span>31 Jan</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Gráfico de líneas para Sales Report
+            const ctx = document.getElementById('salesChart').getContext('2d');
+
+            // Generar datos para el gráfico
+            const generateData = () => {
+                const points = 20;
+                const data = [];
+                for(let i = 0; i < points; i++) {
+                    data.push(Math.floor(Math.random() * 30) + 30);
+                }
+                return data;
+            };
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array(20).fill(''),
+                    datasets: [{
+                        data: generateData(),
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.05)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 0,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100,
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                stepSize: 10,
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
