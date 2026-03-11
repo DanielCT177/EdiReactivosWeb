@@ -1,0 +1,239 @@
+﻿/* dashboard.css - Estilos específicos de las tarjetas y componentes del dashboard */
+
+/* ===== TARJETAS Y COMPONENTES DEL DASHBOARD ===== */
+.dashboard-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    border: 1px solid #f0f2f5;
+    transition: all 0.3s;
+    height: 100%;
+}
+
+    .dashboard-card:hover {
+        box-shadow: 0 8px 30px rgba(0,0,44,0.05);
+        border-color: #e0e7ff;
+    }
+
+/* Tarjetas de estadísticas */
+.stats-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid #f0f2f5;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stats-label {
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stats-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.2;
+}
+
+.stats-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.trend-up {
+    color: #10b981;
+    background: #d1fae5;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.trend-down {
+    color: #ef4444;
+    background: #fee2e2;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.trend-neutral {
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Productos */
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+    .product-item:last-child {
+        border-bottom: none;
+    }
+
+.product-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.product-image {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #f0f4ff, #f1f5f9);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00002c;
+}
+
+.product-name {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+}
+
+.product-price {
+    font-weight: 700;
+    color: #00002c;
+}
+
+/* Eventos */
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.event-date {
+    background: #f8fafd;
+    padding: 0.5rem;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 60px;
+}
+
+.event-day {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #00002c;
+    line-height: 1.2;
+}
+
+.event-month {
+    font-size: 0.8rem;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.event-title {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+/* Categorías */
+.category-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.category-name {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.category-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+}
+
+.category-value {
+    font-weight: 600;
+}
+
+/* Gráfico de barras */
+.active-users-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    height: 100px;
+    margin-top: 1rem;
+}
+
+.bar {
+    flex: 1;
+    background: linear-gradient(180deg, #00002c, #2a2a5c);
+    border-radius: 8px 8px 0 0;
+    transition: height 0.3s;
+    min-width: 8px;
+}
+
+/* Section title */
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1.2rem;
+}
+
+/* Utilidades específicas del dashboard */
+.gradient-text {
+    background: linear-gradient(135deg, #00002c, #2a2a5c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Responsive para componentes del dashboard */
+@media screen and (max-width: 768px) {
+    .stats-value {
+        font-size: 1.8rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .stats-value {
+        font-size: 1.5rem;
+    }
+
+    .product-info {
+        gap: 0.5rem;
+    }
+
+    .event-date {
+        min-width: 50px;
+        padding: 0.3rem;
+    }
+
+    .event-day {
+        font-size: 1rem;
+    }
+
+    .event-month {
+        font-size: 0.7rem;
+    }
+}

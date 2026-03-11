@@ -2,6 +2,9 @@
     ViewData["Title"] = "Dashboard";
 }
 
+<!-- CSS específico para el dashboard -->
+<link rel="stylesheet" href="~/css/dashboard.css" />
+
 <div class="content-wrapper">
     <!-- Fila 1: Overview Stats -->
     <div class="row g-4 mb-4">
@@ -289,8 +292,8 @@
                     labels: Array(20).fill(''),
                     datasets: [{
                         data: generateData(),
-                        borderColor: '#4361ee',
-                        backgroundColor: 'rgba(67, 97, 238, 0.05)',
+                        borderColor: '#00002c',
+                        backgroundColor: 'rgba(0,0,44,0.05)',
                         tension: 0.4,
                         fill: true,
                         pointRadius: 0,

@@ -5,95 +5,252 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Blueberry CRM</title>
 
-    <!-- Bootstrap Icons (los necesitamos para los íconos) -->
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Google Fonts - Inter como en la imagen -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
 
-    <!-- Tus estilos existentes -->
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Nuestro CSS personalizado -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    <!-- Barra superior moderna -->
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4">
-            <div class="container-fluid">
-                <!-- Logo y nombre -->
-                <a class="navbar-brand fw-bold" href="/">
-                    <span style="color: #4361ee;">Blueberry</span> CRM
+    <div class="dashboard-wrapper">
+        <!-- SIDEBAR con color #00002c -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="brand-logo">
+                    <div class="brand-icon">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <span class="brand-text">Blueberry CRM</span>
                 </a>
+            </div>
 
-                <!-- Botón menú hamburguesa -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <!-- Menú de navegación -->
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto align-items-center gap-2">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Dashboard">
-                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+            <nav class="sidebar-nav">
+                <!-- Overview Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">OVERVIEW</div>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="/Dashboard" class="sidebar-link active">
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-graph-up me-1"></i>Analytics
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-graph-up"></i>
+                                <span>Analytics</span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-box me-1"></i>Products
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-people"></i>
+                                <span>Users</span>
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-calendar me-1"></i>Events
-                            </a>
-                        </li>
-                        <!-- Notificaciones -->
-                        <li class="nav-item">
-                            <a class="nav-link position-relative" href="#">
-                                <i class="bi bi-bell fs-5"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                                    3
-                                </span>
-                            </a>
-                        </li>
-                        <!-- Perfil de usuario -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
-                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                                     style="width: 32px; height: 32px; background: linear-gradient(135deg, #4361ee, #06d6a0) !important;">
-                                    <span style="font-size: 0.9rem;">JD</span>
-                                </div>
-                                <span>John Doe</span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a>
-                                <a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
-                            </div>
                         </li>
                     </ul>
                 </div>
-            </div>
-        </nav>
-    </header>
 
-    <!-- Contenido principal - SIN container para que ocupe todo el ancho -->
-    <main>
-        @RenderBody()
-    </main>
+                <!-- PRODUCTS Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">PRODUCTS</div>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-box"></i>
+                                <span>All Products</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-tags"></i>
+                                <span>Categories</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-star"></i>
+                                <span>Top Selling</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- SALES Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">SALES</div>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-cash-stack"></i>
+                                <span>Orders</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-receipt"></i>
+                                <span>Invoices</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-percent"></i>
+                                <span>Discounts</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- EVENTS Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">EVENTS</div>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-calendar"></i>
+                                <span>Calendar</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-clock"></i>
+                                <span>Upcoming</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- SETTINGS Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">SETTINGS</div>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-gear"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-shield"></i>
+                                <span>Security</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Perfil en el sidebar (parte inferior) -->
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span>JD</span>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">John Doe</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                    <i class="bi bi-three-dots-vertical"></i>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content" id="mainContent">
+            <!-- Barra superior -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <button class="toggle-sidebar" id="toggleSidebar">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <h2 class="page-title">@ViewData["Title"]</h2>
+                </div>
+
+                <div class="top-bar-right">
+                    <!-- Search -->
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" placeholder="Search...">
+                    </div>
+
+                    <!-- Notifications -->
+                    <div class="notification-icon">
+                        <i class="bi bi-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+
+                    <!-- Messages -->
+                    <div class="notification-icon">
+                        <i class="bi bi-chat"></i>
+                        <span class="notification-badge">5</span>
+                    </div>
+
+                    <!-- Theme toggle (opcional) -->
+                    <div class="theme-toggle">
+                        <i class="bi bi-moon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido de la página -->
+            <div class="content-wrapper">
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+
+    <!-- Botón para móvil -->
+    <button class="toggle-sidebar-mobile" id="mobileToggle">
+        <i class="bi bi-list"></i>
+    </button>
 
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        $(document).ready(function() {
+            const sidebar = $('#sidebar');
+            const mainContent = $('#mainContent');
+            const toggleBtn = $('#toggleSidebar');
+            const mobileToggle = $('#mobileToggle');
+
+            // Función para colapsar/expandir sidebar en desktop
+            toggleBtn.click(function() {
+                sidebar.toggleClass('collapsed');
+                mainContent.toggleClass('expanded');
+
+                const icon = toggleBtn.find('i');
+                if (sidebar.hasClass('collapsed')) {
+                    icon.removeClass('bi-list').addClass('bi-arrow-right');
+                } else {
+                    icon.removeClass('bi-arrow-right').addClass('bi-list');
+                }
+            });
+
+            // Botón para móvil
+            mobileToggle.click(function() {
+                sidebar.toggleClass('mobile-open');
+            });
+
+            // Cerrar sidebar al hacer click fuera en móvil
+            $(document).on('click', function(e) {
+                if ($(window).width() <= 768) {
+                    if (!sidebar.is(e.target) && sidebar.has(e.target).length === 0 && !mobileToggle.is(e.target) && mobileToggle.has(e.target).length === 0) {
+                        sidebar.removeClass('mobile-open');
+                    }
+                }
+            });
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
