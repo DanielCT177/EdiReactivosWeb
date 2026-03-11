@@ -1,0 +1,77 @@
+# =========================
+
+# .NET / Visual Studio
+
+# =========================
+
+## Build results
+
+bin/
+obj/
+out/
+
+## Visual Studio files
+
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Rider / VS Code
+
+.idea/
+.vscode/
+
+## Logs
+
+*.log
+
+## ASP.NET Core
+
+appsettings.Development.json
+
+## Publish
+
+publish/
+*.pubxml
+*.publishsettings
+
+## Node (por si usas npm para frontend)
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+## OS files
+
+.DS_Store
+Thumbs.db
+
+## Test results
+
+TestResults/
+
+## Resharper
+
+_ReSharper*/
+*.DotSettings.user
+
+## Azure
+
+.azure/
+
+## Docker
+
+docker-compose.override.yml
+
+## Temp files
+
+*.tmp
+*.temp
+*.cache
+
+## Visual Studio Code workspace
+
+*.code-workspace
