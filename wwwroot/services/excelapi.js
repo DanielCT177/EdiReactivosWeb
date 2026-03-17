@@ -209,7 +209,42 @@ window.ExcelApi = {
             throw error
 
         }
+    },
+
+    ////////////////////////////////////////////////////////
+    // 🔹 GENERAR EXCEL POR MATERIAS Y TEMAS
+    ////////////////////////////////////////////////////////
+    async generateExcelByTopics(data) {
+
+        try {
+
+            const response = await fetch(
+                `${API_BASE_URL}/generate-by-topics`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "*/*"
+                    },
+                    body: JSON.stringify(data)
+                }
+            )
+
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`)
+            }
+
+            const result = await response.json()
+
+            return result
+
+        } catch (error) {
+
+            console.error("Error generando Excel por temas:", error)
+            throw error
+
+        }
     }
 }
 
-// Elimina la línea: export default ExcelApi
+

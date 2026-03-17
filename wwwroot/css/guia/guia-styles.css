@@ -44,3 +44,27 @@
     .delete-modal:hover .delete-icon {
         transform: scale(1.1) rotate(5deg);
     }
+
+
+    /* Spinner global sin fondo blanco */
+#globalSpinner {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9999;
+}
+
+/* Prevenir scroll cuando el spinner está activo */
+body.overflow-hidden {
+    overflow: hidden;
+}
+
+/* Estilos para el círculo de progreso */
+#progressCircle {
+    transition: stroke-dashoffset 0.3s ease-out;
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+}
+
+/* Animación de pulso para el texto */
+.text-white {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}

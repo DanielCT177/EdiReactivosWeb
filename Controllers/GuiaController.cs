@@ -9,9 +9,6 @@ namespace EdiReactivosWeb.Controllers
             return View();
         }
 
-        public IActionResult Upload()
-        {
-            return View();
-        }
+
     }
 }

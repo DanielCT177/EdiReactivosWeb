@@ -1,20 +1,20 @@
-   // ============================================
-        // VARIABLES GLOBALES
-        // ============================================
-        let allFiles = []; // Archivos PDF
-        let allWordFiles = []; // Archivos Word generados
-        let pdfFilesMap = {}; // Mapa para relacionar PDFs por ID
-        let filteredFiles = [];
-        let filteredWordFiles = [];
-        let currentPage = 1;
-        let currentWordPage = 1;
-        let itemsPerPage = 5;
-        let currentFileId = null;
-        let currentFileName = '';
-        let pendingDeleteId = null;
-        let pendingDeleteType = 'pdf'; // 'pdf' o 'word'
+// ============================================
+// VARIABLES GLOBALES
+// ============================================
+let allFiles = []; // Archivos PDF
+let allWordFiles = []; // Archivos Word generados
+let pdfFilesMap = {}; // Mapa para relacionar PDFs por ID
+let filteredFiles = [];
+let filteredWordFiles = [];
+let currentPage = 1;
+let currentWordPage = 1;
+let itemsPerPage = 5;
+let currentFileId = null;
+let currentFileName = '';
+let pendingDeleteId = null;
+let pendingDeleteType = 'pdf'; // 'pdf', 'word' o 'excel'
 
-        // ============================================
+// ============================================
 // VARIABLES GLOBALES PARA EXCEL
 // ============================================
 let allExcelFiles = []; // Archivos Excel generados
@@ -22,264 +22,382 @@ let filteredExcelFiles = [];
 let currentExcelPage = 1;
 let itemsPerPageExcel = 5;
 
-        // ============================================
-        // FUNCIONES PARA EL MODAL PDF
-        // ============================================
-        function openPdfModal(fileId, fileName) {
-            currentFileId = fileId;
-            currentFileName = fileName;
-            
-            const pdfUrl = `${PdfApi.baseUrl}/pdf-files/${fileId}`;
-            
-            document.getElementById('modalFileName').textContent = fileName;
-            document.getElementById('pdfViewer').src = pdfUrl;
-            document.getElementById('pdfModal').classList.remove('hidden');
-            
-            // Animación de entrada
-            setTimeout(() => {
-                document.getElementById('pdfModalContent').classList.remove('scale-95');
-                document.getElementById('pdfModalContent').classList.add('scale-100');
-            }, 10);
-            
-            document.body.style.overflow = 'hidden';
-        }
+// ============================================
+// VARIABLES GLOBALES PARA SPINNER CON PROGRESO
+// ============================================
+let activeProcesses = 0;
 
-        function closePdfModal() {
-            document.getElementById('pdfModalContent').classList.remove('scale-100');
-            document.getElementById('pdfModalContent').classList.add('scale-95');
-            
-            setTimeout(() => {
-                document.getElementById('pdfModal').classList.add('hidden');
-                document.getElementById('pdfViewer').src = '';
-                document.body.style.overflow = 'auto';
-            }, 200);
-        }
 
-        // ============================================
-        // FUNCIONES PARA EL MODAL WORD
-        // ============================================
-        function openWordModal(fileName, fileId) {
-            document.getElementById('wordModalFileName').textContent = fileName || 'Documento Word';
-            
-            // Aquí podrías cargar una vista previa si está disponible
-            // Por ahora mostramos el mensaje de vista previa no disponible
-            
-            document.getElementById('wordModal').classList.remove('hidden');
-            
-            setTimeout(() => {
-                document.getElementById('wordModalContent').classList.remove('scale-95');
-                document.getElementById('wordModalContent').classList.add('scale-100');
-            }, 10);
-            
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeWordModal() {
-            document.getElementById('wordModalContent').classList.remove('scale-100');
-            document.getElementById('wordModalContent').classList.add('scale-95');
-            
-            setTimeout(() => {
-                document.getElementById('wordModal').classList.add('hidden');
-                document.body.style.overflow = 'auto';
-            }, 200);
-        }
-
-        // ============================================
-        // FUNCIONES PARA MODAL DE ELIMINACIÓN
-        // ============================================
-        function showDeleteModal(id, fileName) {
-            pendingDeleteId = id;
-            pendingDeleteType = 'pdf';
-            document.getElementById('deleteFileName').textContent = fileName || 'Documento seleccionado';
-            document.getElementById('deleteModalMessage').textContent = 'Esta acción no se puede deshacer y el archivo PDF se perderá permanentemente.';
-            document.getElementById('deleteConfirmModal').classList.remove('hidden');
-            
-            // Animación de entrada y vibración
-            setTimeout(() => {
-                document.getElementById('deleteModalContent').classList.remove('scale-95');
-                document.getElementById('deleteModalContent').classList.add('scale-100');
+// ============================================
+// FUNCIONES PARA SPINNER CON PROGRESO (CON OSCURECIMIENTO)
+// ============================================
+function showProgressSpinner(message = 'Procesando...') {
+    activeProcesses++;
+    
+    // Crear o mostrar el spinner global
+    let spinner = document.getElementById('globalSpinner');
+    if (!spinner) {
+        spinner = document.createElement('div');
+        spinner.id = 'globalSpinner';
+        spinner.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center transition-opacity duration-300';
+        spinner.innerHTML = `
+            <div class="flex flex-col items-center transform scale-95 transition-all duration-300" id="spinnerContent">
+                <!-- Contenedor del círculo de progreso -->
+                <div class="relative w-32 h-32">
+                    <!-- Círculo de fondo -->
+                    <svg class="w-32 h-32 transform -rotate-90">
+                        <circle
+                            cx="64"
+                            cy="64"
+                            r="58"
+                            stroke="rgba(255,255,255,0.2)"
+                            stroke-width="6"
+                            fill="transparent"
+                        />
+                        <circle
+                            cx="64"
+                            cy="64"
+                            r="58"
+                            stroke="#3b82f6"
+                            stroke-width="6"
+                            fill="transparent"
+                            stroke-dasharray="364.42"
+                            stroke-dashoffset="364.42"
+                            class="transition-all duration-300 ease-out"
+                            id="progressCircle"
+                            style="stroke-linecap: round; filter: drop-shadow(0 0 10px #3b82f6);"
+                        />
+                    </svg>
+                    <!-- Porcentaje en el centro -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-white text-2xl font-bold drop-shadow-lg" id="progressPercentage">0%</span>
+                    </div>
+                </div>
                 
-                // Agregar clase de vibración al header
-                const header = document.querySelector('#deleteConfirmModal .shake-animation');
-                header.classList.remove('shake-animation');
-                void header.offsetWidth; // Reiniciar animación
-                header.classList.add('shake-animation');
-            }, 10);
-            
-            document.body.style.overflow = 'hidden';
-        }
-
-        function showDeleteWordModal(id, fileName) {
-            pendingDeleteId = id;
-            pendingDeleteType = 'word';
-            document.getElementById('deleteFileName').textContent = fileName || 'Documento seleccionado';
-            document.getElementById('deleteModalMessage').textContent = 'Esta acción no se puede deshacer y el documento Word generado se perderá permanentemente.';
-            document.getElementById('deleteConfirmModal').classList.remove('hidden');
-            
-            setTimeout(() => {
-                document.getElementById('deleteModalContent').classList.remove('scale-95');
-                document.getElementById('deleteModalContent').classList.add('scale-100');
-                
-                const header = document.querySelector('#deleteConfirmModal .shake-animation');
-                header.classList.remove('shake-animation');
-                void header.offsetWidth;
-                header.classList.add('shake-animation');
-            }, 10);
-            
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('deleteModalContent').classList.remove('scale-100');
-            document.getElementById('deleteModalContent').classList.add('scale-95');
-            
-            setTimeout(() => {
-                document.getElementById('deleteConfirmModal').classList.add('hidden');
-                document.body.style.overflow = 'auto';
-                pendingDeleteId = null;
-            }, 200);
-        }
-
-   // ENCONTRAR la función confirmDelete y MODIFICARLA:
-
-async function confirmDelete() {
-    if (!pendingDeleteId) return;
-
-    const deleteBtn = event.target.closest('button');
-    const originalText = deleteBtn.innerHTML;
-    deleteBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Eliminando...';
-    deleteBtn.disabled = true;
-
-    closeDeleteModal();
-
-    if (pendingDeleteType === 'pdf') {
-        const idToDelete = pendingDeleteId;
-        console.log("Eliminando PDF:", idToDelete);
-        const result = await PdfApi.deleteFile(idToDelete);
+                <!-- Mensaje debajo del spinner -->
+                <p class="text-white font-medium text-base mt-6 text-center max-w-xs px-4 drop-shadow" id="spinnerMessage">${message}</p>
+                <p class="text-blue-300 text-xs mt-2 text-center drop-shadow" id="spinnerSubmessage"></p>
+            </div>
+        `;
+        document.body.appendChild(spinner);
         
-        if (result.success) {
-            await loadFiles();
-            showToast('Documento PDF eliminado correctamente', 'success');
+        // Animación de entrada
+        setTimeout(() => {
+            document.getElementById('spinnerContent').classList.remove('scale-95');
+            document.getElementById('spinnerContent').classList.add('scale-100');
+        }, 50);
+    } else {
+        document.getElementById('spinnerMessage').textContent = message;
+        document.getElementById('spinnerSubmessage').textContent = '';
+        resetProgress();
+        spinner.classList.remove('hidden');
+        
+        // Animación de entrada
+        const content = document.getElementById('spinnerContent');
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+        setTimeout(() => {
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }, 50);
+    }
+    
+    document.body.style.overflow = 'hidden';
+}
+
+function updateProgress(percentage, message = null, submessage = null) {
+    // Asegurar que el porcentaje esté entre 0 y 100
+    percentage = Math.min(100, Math.max(0, percentage));
+    
+    // Actualizar círculo de progreso
+    const circle = document.getElementById('progressCircle');
+    if (circle) {
+        const radius = 58;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (percentage / 100) * circumference;
+        circle.style.strokeDasharray = `${circumference}`;
+        circle.style.strokeDashoffset = offset;
+        
+        // Cambiar color según el progreso
+        if (percentage < 30) {
+            circle.style.stroke = '#3b82f6';
+            circle.style.filter = 'drop-shadow(0 0 10px #3b82f6)';
+        } else if (percentage < 70) {
+            circle.style.stroke = '#8b5cf6';
+            circle.style.filter = 'drop-shadow(0 0 10px #8b5cf6)';
         } else {
-            showErrorModal('Error al eliminar', result.error);
-        }
-    } else if (pendingDeleteType === 'word') { // 👈 CAMBIAR DE 'else' a 'else if'
-        console.log("Eliminando Word generado:", pendingDeleteId);
-        
-        const result = await WordApi.deleteGeneratedFile(pendingDeleteId);
-        
-        if (result.success) {
-            await loadWordDocuments();
-            showToast('Documento Word eliminado correctamente', 'success');
-        } else {
-            showErrorModal('Error al eliminar Word', result.error);
-        }
-    } 
-    // 👇 AÑADIR ESTA PARTE PARA EXCEL
-    else if (pendingDeleteType === 'excel') {
-        console.log("Eliminando Excel generado:", pendingDeleteId);
-        
-        try {
-            const result = await ExcelApi.deleteGeneratedExcel(pendingDeleteId);
-            
-            if (result) {
-                await loadExcelFiles();
-                showToast('Documento Excel eliminado correctamente', 'success');
-            } else {
-                showErrorModal('Error al eliminar Excel', 'No se pudo eliminar el archivo');
-            }
-        } catch (error) {
-            showErrorModal('Error al eliminar Excel', error.message);
+            circle.style.stroke = '#10b981';
+            circle.style.filter = 'drop-shadow(0 0 10px #10b981)';
         }
     }
     
-    deleteBtn.innerHTML = originalText;
-    deleteBtn.disabled = false;
+    // Actualizar texto del porcentaje
+    const percentText = document.getElementById('progressPercentage');
+    if (percentText) {
+        percentText.textContent = `${Math.round(percentage)}%`;
+    }
+    
+    // Actualizar mensajes
+    if (message) {
+        const msgEl = document.getElementById('spinnerMessage');
+        if (msgEl) msgEl.textContent = message;
+    }
+    
+    if (submessage) {
+        const subEl = document.getElementById('spinnerSubmessage');
+        if (subEl) subEl.textContent = submessage;
+    }
 }
-        // ============================================
-        // FUNCIÓN PARA TOAST
-        // ============================================
-        function showToast(message, type = 'success') {
-            let toast = document.getElementById('toastNotification');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'toastNotification';
-                document.body.appendChild(toast);
-            }
-            
-            if (type === 'success') {
-                toast.className = 'fixed bottom-4 right-4 bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 translate-y-20 opacity-0 z-50 flex items-center gap-3';
-                toast.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + message;
-            } else {
-                toast.className = 'fixed bottom-4 right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 translate-y-20 opacity-0 z-50 flex items-center gap-3';
-                toast.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + message;
+
+function resetProgress() {
+    updateProgress(0);
+}
+
+function hideProgressSpinner() {
+    activeProcesses = Math.max(0, activeProcesses - 1);
+    
+    if (activeProcesses === 0) {
+        const spinner = document.getElementById('globalSpinner');
+        if (spinner) {
+            const content = document.getElementById('spinnerContent');
+            if (content) {
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
             }
             
             setTimeout(() => {
-                toast.classList.remove('translate-y-20', 'opacity-0');
-            }, 100);
+                spinner.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                resetProgress();
+            }, 200);
+        }
+    }
+}
+
+
+// ============================================
+// FUNCIONES PARA EL MODAL PDF
+// ============================================
+function openPdfModal(fileId, fileName) {
+    currentFileId = fileId;
+    currentFileName = fileName;
+    
+    const pdfUrl = `${PdfApi.baseUrl}/pdf-files/${fileId}`;
+    
+    document.getElementById('modalFileName').textContent = fileName;
+    document.getElementById('pdfViewer').src = pdfUrl;
+    document.getElementById('pdfModal').classList.remove('hidden');
+    
+    // Animación de entrada
+    setTimeout(() => {
+        document.getElementById('pdfModalContent').classList.remove('scale-95');
+        document.getElementById('pdfModalContent').classList.add('scale-100');
+    }, 10);
+    
+    document.body.style.overflow = 'hidden';
+}
+
+function closePdfModal() {
+    document.getElementById('pdfModalContent').classList.remove('scale-100');
+    document.getElementById('pdfModalContent').classList.add('scale-95');
+    
+    setTimeout(() => {
+        document.getElementById('pdfModal').classList.add('hidden');
+        document.getElementById('pdfViewer').src = '';
+        document.body.style.overflow = 'auto';
+    }, 200);
+}
+
+// ============================================
+// FUNCIONES PARA EL MODAL WORD
+// ============================================
+function openWordModal(fileName, fileId) {
+    document.getElementById('wordModalFileName').textContent = fileName || 'Documento Word';
+    
+    // Aquí podrías cargar una vista previa si está disponible
+    // Por ahora mostramos el mensaje de vista previa no disponible
+    
+    document.getElementById('wordModal').classList.remove('hidden');
+    
+    setTimeout(() => {
+        document.getElementById('wordModalContent').classList.remove('scale-95');
+        document.getElementById('wordModalContent').classList.add('scale-100');
+    }, 10);
+    
+    document.body.style.overflow = 'hidden';
+}
+
+function closeWordModal() {
+    document.getElementById('wordModalContent').classList.remove('scale-100');
+    document.getElementById('wordModalContent').classList.add('scale-95');
+    
+    setTimeout(() => {
+        document.getElementById('wordModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }, 200);
+}
+
+// ============================================
+// FUNCIONES PARA MODAL DE ELIMINACIÓN
+// ============================================
+function showDeleteModal(id, fileName) {
+    pendingDeleteId = id;
+    pendingDeleteType = 'pdf';
+    document.getElementById('deleteFileName').textContent = fileName || 'Documento seleccionado';
+    document.getElementById('deleteModalMessage').textContent = 'Esta acción no se puede deshacer y el archivo PDF se perderá permanentemente.';
+    document.getElementById('deleteConfirmModal').classList.remove('hidden');
+    
+    // Animación de entrada y vibración
+    setTimeout(() => {
+        document.getElementById('deleteModalContent').classList.remove('scale-95');
+        document.getElementById('deleteModalContent').classList.add('scale-100');
+        
+        // Agregar clase de vibración al header
+        const header = document.querySelector('#deleteConfirmModal .shake-animation');
+        header.classList.remove('shake-animation');
+        void header.offsetWidth; // Reiniciar animación
+        header.classList.add('shake-animation');
+    }, 10);
+    
+    document.body.style.overflow = 'hidden';
+}
+
+function showDeleteWordModal(id, fileName) {
+    pendingDeleteId = id;
+    pendingDeleteType = 'word';
+    document.getElementById('deleteFileName').textContent = fileName || 'Documento seleccionado';
+    document.getElementById('deleteModalMessage').textContent = 'Esta acción no se puede deshacer y el documento Word generado se perderá permanentemente.';
+    document.getElementById('deleteConfirmModal').classList.remove('hidden');
+    
+    setTimeout(() => {
+        document.getElementById('deleteModalContent').classList.remove('scale-95');
+        document.getElementById('deleteModalContent').classList.add('scale-100');
+        
+        const header = document.querySelector('#deleteConfirmModal .shake-animation');
+        header.classList.remove('shake-animation');
+        void header.offsetWidth;
+        header.classList.add('shake-animation');
+    }, 10);
+    
+    document.body.style.overflow = 'hidden';
+}
+
+function showDeleteExcelModal(id, fileName) {
+    pendingDeleteId = id;
+    pendingDeleteType = 'excel';
+    document.getElementById('deleteFileName').textContent = fileName || 'Documento Excel';
+    document.getElementById('deleteModalMessage').textContent = 'Esta acción no se puede deshacer y el archivo Excel se perderá permanentemente.';
+    document.getElementById('deleteConfirmModal').classList.remove('hidden');
+    
+    setTimeout(() => {
+        document.getElementById('deleteModalContent').classList.remove('scale-95');
+        document.getElementById('deleteModalContent').classList.add('scale-100');
+        
+        const header = document.querySelector('#deleteConfirmModal .shake-animation');
+        header.classList.remove('shake-animation');
+        void header.offsetWidth;
+        header.classList.add('shake-animation');
+    }, 10);
+    
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModalContent').classList.remove('scale-100');
+    document.getElementById('deleteModalContent').classList.add('scale-95');
+    
+    setTimeout(() => {
+        document.getElementById('deleteConfirmModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        pendingDeleteId = null;
+    }, 200);
+}
+
+// ============================================
+// FUNCIÓN PARA TOAST
+// ============================================
+function showToast(message, type = 'success') {
+    let toast = document.getElementById('toastNotification');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toastNotification';
+        document.body.appendChild(toast);
+    }
+    
+    if (type === 'success') {
+        toast.className = 'fixed bottom-4 right-4 bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 translate-y-20 opacity-0 z-50 flex items-center gap-3';
+        toast.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + message;
+    } else {
+        toast.className = 'fixed bottom-4 right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 translate-y-20 opacity-0 z-50 flex items-center gap-3';
+        toast.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + message;
+    }
+    
+    setTimeout(() => {
+        toast.classList.remove('translate-y-20', 'opacity-0');
+    }, 100);
+    
+    setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+    }, 3000);
+}
+
+// ============================================
+// FUNCIONES PARA MODAL DE ERROR
+// ============================================
+function showErrorModal(title, detail) {
+    hideProgressSpinner(); // Asegurar que el spinner se oculte en caso de error
+    document.getElementById('errorMessage').textContent = title || 'Error';
+    document.getElementById('errorDetail').textContent = detail || 'Ha ocurrido un error inesperado';
+    document.getElementById('errorModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeErrorModal() {
+    document.getElementById('errorModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+// ============================================
+// CARGAR ARCHIVOS AL INICIAR
+// ============================================
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadFiles();
+    await loadWordDocuments();
+    await loadExcelFiles();
+    updateHeaderStats();
+});
+
+// ============================================
+// FUNCIÓN PARA CARGAR ARCHIVOS PDF
+// ============================================
+async function loadFiles() {
+    try {
+        const result = await PdfApi.getFiles();
+        
+        if (result.success) {
+            allFiles = result.files || [];
             
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
-        // ============================================
-        // FUNCIONES PARA MODAL DE ERROR
-        // ============================================
-        function showErrorModal(title, detail) {
-            document.getElementById('errorMessage').textContent = title || 'Error';
-            document.getElementById('errorDetail').textContent = detail || 'Ha ocurrido un error inesperado';
-            document.getElementById('errorModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeErrorModal() {
-            document.getElementById('errorModal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-
-        // ============================================
-        // CARGAR ARCHIVOS AL INICIAR
-        // ============================================
-        document.addEventListener('DOMContentLoaded', async function() {
-            await loadFiles();
-            await loadWordDocuments();
-            await loadExcelFiles();
-            updateHeaderStats();
-        });
-
-        // ============================================
-        // FUNCIÓN PARA CARGAR ARCHIVOS PDF
-        // ============================================
-        async function loadFiles() {
-            try {
-                const result = await PdfApi.getFiles();
-                
-                if (result.success) {
-                    allFiles = result.files || [];
-                    
-                    // Crear un mapa de PDFs por ID para referencia rápida
-                    pdfFilesMap = {};
-                    allFiles.forEach(file => {
-                        if (file.id) {
-                            pdfFilesMap[file.id] = file;
-                        }
-                    });
-                    
-                    filteredFiles = [...allFiles];
-                    renderTable();
-                    updatePDFStats();
-                } else {
-                    showErrorModal('Error al cargar archivos PDF', result.error);
+            // Crear un mapa de PDFs por ID para referencia rápida
+            pdfFilesMap = {};
+            allFiles.forEach(file => {
+                if (file.id) {
+                    pdfFilesMap[file.id] = file;
                 }
-            } catch (error) {
-                showErrorModal('Error de conexión', 'No se pudo conectar con la API');
-                console.error(error);
-            }
+            });
+            
+            filteredFiles = [...allFiles];
+            renderTable();
+            updatePDFStats();
+        } else {
+            showErrorModal('Error al cargar archivos PDF', result.error);
         }
+    } catch (error) {
+        showErrorModal('Error de conexión', 'No se pudo conectar con la API');
+        console.error(error);
+    }
+}
 
-       // ============================================
+// ============================================
 // FUNCIÓN HELPER PARA MANEJAR LOADING DE FORMA SEGURA
 // ============================================
 function setWordLoading(show) {
@@ -316,11 +434,11 @@ function createLoadingRow() {
 }
 
 // ============================================
-// FUNCIÓN CORREGIDA USANDO EL HELPER
+// FUNCIÓN PARA CARGAR DOCUMENTOS WORD
 // ============================================
 async function loadWordDocuments() {
     try {
-        setWordLoading(true); // ✅ Seguro, crea el loading si no existe
+        setWordLoading(true);
 
         const result = await WordApi.getGeneratedFiles();
         
@@ -333,7 +451,7 @@ async function loadWordDocuments() {
             }
             
             filteredWordFiles = [...allWordFiles];
-            renderWordTable(); // 👈 Esto SOBRESCRIBE el tbody (ADIÓS loadingRow)
+            renderWordTable();
             updateWordStats();
             showToast('Documentos Word actualizados', 'success');
         } else {
@@ -343,638 +461,915 @@ async function loadWordDocuments() {
         showErrorModal('Error de conexión', 'No se pudo cargar los documentos Word');
         console.error(error);
     }
-    // ✅ No necesitamos ocultar loading porque renderWordTable() ya lo reemplazó
 }
 
-        // ============================================
-        // FUNCIÓN MEJORADA PARA OBTENER INFO DEL PDF ORIGEN
-        // ============================================
-        function getSourcePdfInfo(wordFile) {
-            // Ahora el API debería devolver SourcePdfId y SourcePdfName
-            const sourcePdfId = wordFile.sourcePdfId;
-            const sourcePdfName = wordFile.sourcePdfName;
-            
-            if (sourcePdfId && sourcePdfName) {
-                // Verificar si el PDF aún existe en la tabla de PDFs
-                const pdfExists = pdfFilesMap[sourcePdfId] ? true : false;
-                
-                return {
-                    id: sourcePdfId,
-                    name: sourcePdfName,
-                    exists: pdfExists
-                };
-            }
-            
-            return {
-                name: 'No disponible',
-                id: null,
-                exists: false
-            };
+// ============================================
+// FUNCIÓN MEJORADA PARA OBTENER INFO DEL PDF ORIGEN
+// ============================================
+function getSourcePdfInfo(wordFile) {
+    // Ahora el API debería devolver SourcePdfId y SourcePdfName
+    const sourcePdfId = wordFile.sourcePdfId;
+    const sourcePdfName = wordFile.sourcePdfName;
+    
+    if (sourcePdfId && sourcePdfName) {
+        // Verificar si el PDF aún existe en la tabla de PDFs
+        const pdfExists = pdfFilesMap[sourcePdfId] ? true : false;
+        
+        return {
+            id: sourcePdfId,
+            name: sourcePdfName,
+            exists: pdfExists
+        };
+    }
+    
+    return {
+        name: 'No disponible',
+        id: null,
+        exists: false
+    };
+}
+
+// ============================================
+// RENDERIZAR TABLA PDF
+// ============================================
+function renderTable() {
+    const tbody = document.getElementById('filesTableBody');
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageFiles = filteredFiles.slice(start, end);
+
+    if (filteredFiles.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center">
+                        <i class="fa-solid fa-folder-open text-gray-300 text-5xl mb-4"></i>
+                        <p class="text-gray-500 text-lg">No hay documentos PDF</p>
+                        <p class="text-gray-400 text-sm mt-1">Sube tu primer PDF usando el formulario de arriba</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    let html = '';
+    pageFiles.forEach(file => {
+        if (!file.id) {
+            console.error('Archivo sin ID:', file);
+            return;
         }
 
-        // ============================================
-        // RENDERIZAR TABLA PDF
-        // ============================================
-        function renderTable() {
-            const tbody = document.getElementById('filesTableBody');
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const pageFiles = filteredFiles.slice(start, end);
-
-            if (filteredFiles.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="px-6 py-12 text-center">
-                            <div class="flex flex-col items-center">
-                                <i class="fa-solid fa-folder-open text-gray-300 text-5xl mb-4"></i>
-                                <p class="text-gray-500 text-lg">No hay documentos PDF</p>
-                                <p class="text-gray-400 text-sm mt-1">Sube tu primer PDF usando el formulario de arriba</p>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            let html = '';
-            pageFiles.forEach(file => {
-                if (!file.id) {
-                    console.error('Archivo sin ID:', file);
-                    return;
-                }
-
-                const fileId = file.id;
-                const fileName = file.originalName || (file.path ? file.path.split('/').pop() : 'Sin nombre');
-                
-                const uploadDate = file.uploadDate ? new Date(file.uploadDate) : new Date();
-                const formattedDate = uploadDate.toLocaleDateString('es-ES', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
-                html += `
-                    <tr class="hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-purple-50/30 transition-all group">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fa-solid fa-file-pdf text-red-500 text-lg"></i>
-                                </div>
-                                <span class="font-medium text-gray-800">${fileName}</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-gray-600">${file.fileSize ? formatFileSize(file.fileSize) : 'N/A'}</td>
-                        <td class="px-6 py-4 text-gray-600">${formattedDate}</td>
-                        <td class="px-6 py-4">
-                            <span class="bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg text-xs font-mono">${fileId.substring(0, 8)}...</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex gap-2">
-                                <button onclick="openPdfModal('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Ver PDF">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-                                
-                                <button onclick="downloadFile('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all" title="Descargar">
-                                    <i class="fa-solid fa-download"></i>
-                                </button>
-                                <button onclick="generateWordFromPdf('${fileId}')" 
-                                    class="w-9 h-9 rounded-xl text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-all" 
-                                    title="Generar Word con IA">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                </button>
-                                
-                                <button onclick="showDeleteModal('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all" title="Eliminar">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            tbody.innerHTML = html;
-            document.getElementById('loadingRow')?.remove();
-            updatePagination();
-            updatePDFStats();
-        }
-
-        // ============================================
-        // RENDERIZAR TABLA WORD (ACTUALIZADA)
-        // ============================================
-        function renderWordTable() {
-            const tbody = document.getElementById('wordFilesTableBody');
-            const start = (currentWordPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const pageFiles = filteredWordFiles.slice(start, end);
-
-            // Ocultar loading
-            document.getElementById('loadingWordRow').style.display = 'none';
-
-            if (filteredWordFiles.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="px-6 py-12 text-center">
-                            <div class="flex flex-col items-center">
-                                <i class="fa-solid fa-file-word text-gray-300 text-5xl mb-4"></i>
-                                <p class="text-gray-500 text-lg">No hay documentos Word generados</p>
-                                <p class="text-gray-400 text-sm mt-1">Genera tu primer documento Word desde un PDF usando el botón <i class="fa-solid fa-wand-magic-sparkles text-purple-500"></i></p>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            let html = '';
-            pageFiles.forEach(file => {
-                if (!file.id) {
-                    console.error('Archivo Word sin ID:', file);
-                    return;
-                }
-
-                const fileId = file.id;
-                const fileName = file.originalName || 'Sin nombre';
-                
-                const uploadDate = file.uploadDate ? new Date(file.uploadDate) : new Date();
-                const formattedDate = uploadDate.toLocaleDateString('es-ES', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
-                // 👇 NUEVO: Obtener información del PDF origen usando la función mejorada
-                const sourceInfo = getSourcePdfInfo(file);
-                
-                let sourcePdfHtml = '';
-                if (sourceInfo.id && sourceInfo.exists) {
-                    // El PDF existe - mostramos enlace
-                    sourcePdfHtml = `
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-file-pdf text-red-500 text-sm"></i>
-                            <button onclick="openPdfModal('${sourceInfo.id}', '${sourceInfo.name}')" 
-                                class="text-sm text-blue-600 hover:underline truncate max-w-[150px]"
-                                title="Ver PDF original">
-                                ${sourceInfo.name}
-                            </button>
-                        </div>
-                    `;
-                } else if (sourceInfo.id) {
-                    // El PDF fue eliminado
-                    sourcePdfHtml = `
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-file-pdf text-gray-300 text-sm"></i>
-                            <span class="text-sm text-gray-400 italic" title="PDF eliminado">
-                                ${sourceInfo.name} (eliminado)
-                            </span>
-                        </div>
-                    `;
-                } else {
-                    // No hay información
-                    sourcePdfHtml = `
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-file-pdf text-gray-300 text-sm"></i>
-                            <span class="text-sm text-gray-400 italic">
-                                No disponible
-                            </span>
-                        </div>
-                    `;
-                }
-
-                html += `
-                    <tr class="hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-purple-50/30 transition-all group">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fa-solid fa-file-word text-blue-600 text-lg"></i>
-                                </div>
-                                <span class="font-medium text-gray-800">${fileName}</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-gray-600">${file.fileSize ? formatFileSize(file.fileSize) : 'N/A'}</td>
-                        <td class="px-6 py-4 text-gray-600">${formattedDate}</td>
-                        <td class="px-6 py-4">
-                            ${sourcePdfHtml}
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex gap-2">
-                                <button onclick="openWordModal('${fileName}', '${fileId}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Ver Word">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-                                
-                                <button onclick="downloadWordFile('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all" title="Descargar">
-                                    <i class="fa-solid fa-download"></i>
-                                </button>
-                                <button onclick="generateExcelFromWord('${fileId}', '${fileName}')" 
-            class="w-9 h-9 rounded-xl text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all" 
-            title="Generar Excel desde Word">
-            <i class="fa-solid fa-file-excel"></i>
-        </button>
-                                
-                                <button onclick="showDeleteWordModal('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all" title="Eliminar">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            tbody.innerHTML = html;
-            updateWordPagination();
-        }
-
-        // ============================================
-        // ACTUALIZAR ESTADÍSTICAS
-        // ============================================
-        function updateHeaderStats() {
-            updatePDFStats();
-            updateWordStats();
-            updateExcelStats();
-        }
-
-        function updatePDFStats() {
-            const totalPDFs = allFiles.length;
-            document.getElementById('totalDocumentosPDF').textContent = `${totalPDFs} ${totalPDFs === 1 ? 'PDF' : 'PDFs'}`;
-            document.getElementById('pdfCountBadge').textContent = `${totalPDFs} ${totalPDFs === 1 ? 'documento' : 'documentos'}`;
-        }
-
-        function updateWordStats() {
-            const totalWords = allWordFiles.length;
-            document.getElementById('totalDocumentosWord').textContent = `${totalWords} ${totalWords === 1 ? 'Word' : 'Words'}`;
-            document.getElementById('wordCountBadge').textContent = `${totalWords} ${totalWords === 1 ? 'documento' : 'documentos'}`;
-        }
-
-        // ============================================
-        // SUBIR ARCHIVO
-        // ============================================
-        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const file = fileInput.files[0];
-            if (!file) {
-                showErrorModal('Archivo no seleccionado', 'Por favor selecciona un archivo PDF');
-                return;
-            }
-
-            progressContainer.classList.remove('hidden');
-            
-            try {
-                const result = await PdfApi.uploadPdfFile(file);
-                
-                if (result.success) {
-                    progressBar.style.width = '100%';
-                    progressPercent.textContent = '100%';
-                    
-                    setTimeout(() => {
-                        showToast('✅ Documento subido correctamente', 'success');
-                        resetForm();
-                        loadFiles();
-                    }, 500);
-                } else {
-                    throw new Error(result.error);
-                }
-            } catch (error) {
-                progressContainer.classList.add('hidden');
-                showErrorModal('Error al subir', error.message);
-            }
+        const fileId = file.id;
+        const fileName = file.originalName || (file.path ? file.path.split('/').pop() : 'Sin nombre');
+        
+        const uploadDate = file.uploadDate ? new Date(file.uploadDate) : new Date();
+        const formattedDate = uploadDate.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
         });
 
-        // ============================================
-        // DESCARGAR ARCHIVO
-        // ============================================
-        async function downloadFile(id, fileName) {
-            try {
-                const result = await PdfApi.downloadFileById(id);
-                if (!result.success) {
-                    showErrorModal('Error al descargar', result.error);
-                }
-            } catch (error) {
-                showErrorModal('Error de conexión', 'No se pudo conectar con el servidor');
-            }
-        }
-
-        function downloadWordFile(fileId, fileName) {
-            showToast(`Descargando ${fileName}...`, 'success');
-            
-            // Construir URL de descarga para archivos Word generados
-            const downloadUrl = `${WordApi.baseUrl}/word-files/generated/${fileId}`;
-            
-            // Crear un enlace temporal para descargar
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = fileName || 'documento.docx';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // ============================================
-        // GENERAR WORD DESDE PDF (ACTUALIZADA)
-        // ============================================
-        async function generateWordFromPdf(fileId) {
-            try {
-                showToast("Generando estructura con IA...", "success");
-
-                // Obtener el nombre del PDF original
-                const pdfFile = allFiles.find(f => f.id === fileId);
-                if (!pdfFile) {
-                    throw new Error("No se encontró el PDF original");
-                }
-                
-                const pdfName = pdfFile.originalName;
-                console.log("📄 Generando Word desde PDF:", pdfName);
-
-                // 1️⃣ Generar estructura JSON
-                const estructura = await WordApi.parsePdfWithAI(fileId);
-
-                if (!estructura.success) {
-                    throw new Error("No se pudo generar la estructura con IA");
-                }
-
-                console.log("Estructura generada:", estructura.data);
-                showToast("Generando Word...", "success");
-
-                // 👇 NUEVO: Pasar el ID y nombre del PDF al generar el Word
-                const word = await WordApi.generateFromAiStructure(
-                    estructura.data, 
-                    fileId,           // 👈 Enviamos el ID del PDF
-                    pdfName           // 👈 Enviamos el NOMBRE del PDF
-                );
-
-                if (!word.success) {
-                    throw new Error("No se pudo generar el Word");
-                }
-
-                console.log("✅ Word generado:", word.data);
-                showToast(`Word generado: ${word.data.originalName}`, "success");
-                
-                // Actualizar tabla de Word después de generar uno nuevo
-                setTimeout(async () => {
-                    await loadWordDocuments();
-                }, 1500);
-
-            } catch (error) {
-                console.error(error);
-                showErrorModal("Error generando Word", error.message);
-            }
-        }
-
-        // ============================================
-        // BÚSQUEDA EN TIEMPO REAL (PDF)
-        // ============================================
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            
-            filteredFiles = allFiles.filter(file => {
-                const fileName = (file.originalName || file.path || '').toLowerCase();
-                return fileName.includes(searchTerm) || (file.id && file.id.includes(searchTerm));
-            });
-            
-            currentPage = 1;
-            renderTable();
-        });
-
-        // ============================================
-        // BÚSQUEDA EN TIEMPO REAL (WORD)
-        // ============================================
-        document.getElementById('searchWordInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            
-            filteredWordFiles = allWordFiles.filter(file => {
-                const fileName = (file.originalName || '').toLowerCase();
-                const sourceName = (file.sourcePdfName || '').toLowerCase();
-                
-                return fileName.includes(searchTerm) || 
-                       sourceName.includes(searchTerm) || 
-                       (file.id && file.id.includes(searchTerm));
-            });
-            
-            currentWordPage = 1;
-            renderWordTable();
-        });
-
-        // ============================================
-        // ACTUALIZAR PAGINACIÓN PDF
-        // ============================================
-        function updatePagination() {
-            const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
-            const paginationInfo = document.getElementById('paginationInfo');
-            const paginationControls = document.getElementById('paginationControls');
-            
-            const start = (currentPage - 1) * itemsPerPage + 1;
-            const end = Math.min(currentPage * itemsPerPage, filteredFiles.length);
-            
-            paginationInfo.innerHTML = `
-                <i class="fa-regular fa-file-pdf mr-2"></i>
-                Mostrando ${filteredFiles.length > 0 ? start : 0}-${end} de ${filteredFiles.length} resultados
-            `;
-
-            if (totalPages <= 1) {
-                paginationControls.innerHTML = '';
-                return;
-            }
-
-            let controls = '';
-            
-            controls += `
-                <button onclick="changePage(${currentPage - 1})" 
-                    ${currentPage === 1 ? 'disabled' : ''}
-                    class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-[#00002c] hover:text-white hover:border-[#00002c] transition-all ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
-                </button>
-            `;
-
-            for (let i = 1; i <= totalPages; i++) {
-                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
-                    controls += `
-                        <button onclick="changePage(${i})" 
-                            class="w-10 h-10 rounded-xl ${i === currentPage ? 'bg-gradient-to-r from-[#00002c] to-[#1a1a5c] text-white shadow-md' : 'border-2 border-gray-200 text-gray-500 hover:bg-[#00002c] hover:text-white hover:border-[#00002c]'} transition-all">
-                            ${i}
+        html += `
+            <tr class="hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-purple-50/30 transition-all group">
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-pdf text-red-500 text-lg"></i>
+                        </div>
+                        <span class="font-medium text-gray-800">${fileName}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">${file.fileSize ? formatFileSize(file.fileSize) : 'N/A'}</td>
+                <td class="px-6 py-4 text-gray-600">${formattedDate}</td>
+                <td class="px-6 py-4">
+                    <span class="bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg text-xs font-mono">${fileId.substring(0, 8)}...</span>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex gap-2">
+                        <button onclick="openPdfModal('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Ver PDF">
+                            <i class="fa-solid fa-eye"></i>
                         </button>
-                    `;
-                } else if (i === currentPage - 2 || i === currentPage + 2) {
-                    controls += `<span class="w-10 h-10 flex items-center justify-center text-gray-400">...</span>`;
-                }
-            }
-
-            controls += `
-                <button onclick="changePage(${currentPage + 1})" 
-                    ${currentPage === totalPages ? 'disabled' : ''}
-                    class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-[#00002c] hover:text-white hover:border-[#00002c] transition-all ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
-            `;
-
-            paginationControls.innerHTML = controls;
-        }
-
-        // ============================================
-        // ACTUALIZAR PAGINACIÓN WORD
-        // ============================================
-        function updateWordPagination() {
-            const totalPages = Math.ceil(filteredWordFiles.length / itemsPerPage);
-            const paginationInfo = document.getElementById('wordPaginationInfo');
-            const paginationControls = document.getElementById('wordPaginationControls');
-            
-            const start = (currentWordPage - 1) * itemsPerPage + 1;
-            const end = Math.min(currentWordPage * itemsPerPage, filteredWordFiles.length);
-            
-            paginationInfo.innerHTML = `
-                <i class="fa-regular fa-file-word mr-2 text-blue-500"></i>
-                Mostrando ${filteredWordFiles.length > 0 ? start : 0}-${end} de ${filteredWordFiles.length} resultados
-            `;
-
-            if (totalPages <= 1) {
-                paginationControls.innerHTML = '';
-                return;
-            }
-
-            let controls = '';
-            
-            controls += `
-                <button onclick="changeWordPage(${currentWordPage - 1})" 
-                    ${currentWordPage === 1 ? 'disabled' : ''}
-                    class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all ${currentWordPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
-                </button>
-            `;
-
-            for (let i = 1; i <= totalPages; i++) {
-                if (i === 1 || i === totalPages || (i >= currentWordPage - 1 && i <= currentWordPage + 1)) {
-                    controls += `
-                        <button onclick="changeWordPage(${i})" 
-                            class="w-10 h-10 rounded-xl ${i === currentWordPage ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md' : 'border-2 border-gray-200 text-gray-500 hover:bg-blue-600 hover:text-white hover:border-blue-600'} transition-all">
-                            ${i}
+                        
+                        <button onclick="downloadFile('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all" title="Descargar">
+                            <i class="fa-solid fa-download"></i>
                         </button>
-                    `;
-                } else if (i === currentWordPage - 2 || i === currentWordPage + 2) {
-                    controls += `<span class="w-10 h-10 flex items-center justify-center text-gray-400">...</span>`;
-                }
-            }
+                        <button onclick="generateWordFromPdf('${fileId}')" 
+                            class="w-9 h-9 rounded-xl text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-all" 
+                            title="Generar Word con IA">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
+                        
+                        <button onclick="showDeleteModal('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all" title="Eliminar">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
 
-            controls += `
-                <button onclick="changeWordPage(${currentWordPage + 1})" 
-                    ${currentWordPage === totalPages ? 'disabled' : ''}
-                    class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all ${currentWordPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
+    tbody.innerHTML = html;
+    document.getElementById('loadingRow')?.remove();
+    updatePagination();
+    updatePDFStats();
+}
+
+// ============================================
+// RENDERIZAR TABLA WORD
+// ============================================
+function renderWordTable() {
+    const tbody = document.getElementById('wordFilesTableBody');
+    const start = (currentWordPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageFiles = filteredWordFiles.slice(start, end);
+
+    // Ocultar loading
+    document.getElementById('loadingWordRow').style.display = 'none';
+
+    if (filteredWordFiles.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center">
+                        <i class="fa-solid fa-file-word text-gray-300 text-5xl mb-4"></i>
+                        <p class="text-gray-500 text-lg">No hay documentos Word generados</p>
+                        <p class="text-gray-400 text-sm mt-1">Genera tu primer documento Word desde un PDF usando el botón <i class="fa-solid fa-wand-magic-sparkles text-purple-500"></i></p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    let html = '';
+    pageFiles.forEach(file => {
+        if (!file.id) {
+            console.error('Archivo Word sin ID:', file);
+            return;
+        }
+
+        const fileId = file.id;
+        const fileName = file.originalName || 'Sin nombre';
+        
+        const uploadDate = file.uploadDate ? new Date(file.uploadDate) : new Date();
+        const formattedDate = uploadDate.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // Obtener información del PDF origen usando la función mejorada
+        const sourceInfo = getSourcePdfInfo(file);
+        
+        let sourcePdfHtml = '';
+        if (sourceInfo.id && sourceInfo.exists) {
+            // El PDF existe - mostramos enlace
+            sourcePdfHtml = `
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf text-red-500 text-sm"></i>
+                    <button onclick="openPdfModal('${sourceInfo.id}', '${sourceInfo.name}')" 
+                        class="text-sm text-blue-600 hover:underline truncate max-w-[150px]"
+                        title="Ver PDF original">
+                        ${sourceInfo.name}
+                    </button>
+                </div>
             `;
-
-            paginationControls.innerHTML = controls;
+        } else if (sourceInfo.id) {
+            // El PDF fue eliminado
+            sourcePdfHtml = `
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf text-gray-300 text-sm"></i>
+                    <span class="text-sm text-gray-400 italic" title="PDF eliminado">
+                        ${sourceInfo.name} (eliminado)
+                    </span>
+                </div>
+            `;
+        } else {
+            // No hay información
+            sourcePdfHtml = `
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf text-gray-300 text-sm"></i>
+                    <span class="text-sm text-gray-400 italic">
+                        No disponible
+                    </span>
+                </div>
+            `;
         }
 
-        // ============================================
-        // CAMBIAR PÁGINA PDF
-        // ============================================
-        function changePage(page) {
-            currentPage = page;
-            renderTable();
+        html += `
+            <tr class="hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-purple-50/30 transition-all group">
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-word text-blue-600 text-lg"></i>
+                        </div>
+                        <span class="font-medium text-gray-800">${fileName}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">${file.fileSize ? formatFileSize(file.fileSize) : 'N/A'}</td>
+                <td class="px-6 py-4 text-gray-600">${formattedDate}</td>
+                <td class="px-6 py-4">
+                    ${sourcePdfHtml}
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex gap-2">
+                        <button onclick="openWordModal('${fileName}', '${fileId}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Ver Word">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                        
+                        <button onclick="downloadWordFile('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all" title="Descargar">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                        <button onclick="generateExcelFromWord('${fileId}', '${fileName}')" 
+                            class="w-9 h-9 rounded-xl text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all" 
+                            title="Generar Excel desde Word">
+                            <i class="fa-solid fa-file-excel"></i>
+                        </button>
+                        
+                        <button onclick="showDeleteWordModal('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all" title="Eliminar">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+    updateWordPagination();
+}
+
+// ============================================
+// FUNCIÓN PARA GENERAR WORD DESDE PDF (CON PROGRESO REALISTA)
+// ============================================
+async function generateWordFromPdf(fileId) {
+    try {
+        showProgressSpinner("Iniciando generación con IA...");
+        
+        // Inicializar progreso
+        updateProgress(0, "Preparando sistema...");
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Obtener el nombre del PDF original
+        updateProgress(5, "Buscando archivo PDF...");
+        const pdfFile = allFiles.find(f => f.id === fileId);
+        if (!pdfFile) {
+            throw new Error("No se encontró el PDF original");
+        }
+        
+        const pdfName = pdfFile.originalName;
+        console.log("📄 Generando Word desde PDF:", pdfName);
+        
+        updateProgress(10, "PDF encontrado, procesando...");
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        // 1️⃣ Generar estructura JSON (10-50%)
+        updateProgress(15, "Conectando con IA...");
+        
+        const parseStartTime = Date.now();
+        const estructura = await WordApi.parsePdfWithAI(fileId);
+
+        if (!estructura.success) {
+            throw new Error("No se pudo generar la estructura con IA");
         }
 
-        // ============================================
-        // CAMBIAR PÁGINA WORD
-        // ============================================
-        function changeWordPage(page) {
-            currentWordPage = page;
-            renderWordTable();
+        // Calcular progreso basado en tiempo real
+        const parseElapsed = Date.now() - parseStartTime;
+        let progress = Math.min(50, 15 + Math.floor(parseElapsed / 300));
+        
+        updateProgress(progress, "Estructura analizada, preparando Word...");
+        console.log("Estructura generada:", estructura.data);
+        await new Promise(resolve => setTimeout(resolve, 700));
+
+        // 2️⃣ Generar Word (50-95%)
+        updateProgress(55, "Generando documento Word...");
+        
+        const wordStartTime = Date.now();
+        const word = await WordApi.generateFromAiStructure(
+            estructura.data, 
+            fileId,
+            pdfName
+        );
+
+        if (!word.success) {
+            throw new Error("No se pudo generar el Word");
         }
 
-        // ============================================
-        // ELEMENTOS DEL DOM
-        // ============================================
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const selectFileBtn = document.getElementById('selectFileBtn');
-        const fileInfo = document.getElementById('fileInfo');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
-        const changeFileBtn = document.getElementById('changeFileBtn');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressBar = document.getElementById('progressBar');
-        const progressPercent = document.getElementById('progressPercent');
+        // Calcular progreso de generación
+        const wordElapsed = Date.now() - wordStartTime;
+        progress = Math.min(95, 55 + Math.floor(wordElapsed / 200));
+        
+        updateProgress(progress, "Word generado, preparando archivo...");
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Finalizar (95-100%)
+        updateProgress(98, "Procesando archivo final...");
+        await new Promise(resolve => setTimeout(resolve, 600));
+        
+        // Actualizar tabla de Word
+        await loadWordDocuments();
+        
+        updateProgress(100, "¡Word generado con éxito!");
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        hideProgressSpinner();
+        showToast(`Word generado: ${word.data.originalName}`, "success");
 
-        function resetForm() {
-            fileInfo.classList.add('hidden');
-            progressContainer.classList.add('hidden');
-            fileInput.value = '';
+    } catch (error) {
+        hideProgressSpinner();
+        console.error(error);
+        showErrorModal("Error generando Word", error.message);
+    }
+}
+
+// ============================================
+// FUNCIÓN PARA GENERAR EXCEL DESDE WORD (CON PROGRESO REALISTA)
+// ============================================
+async function generateExcelFromWord(wordFileId, wordFileName) {
+    try {
+        showProgressSpinner("📊 Iniciando generación de Excel...");
+        
+        // Inicializar progreso en 0
+        updateProgress(0, "Preparando entorno...");
+        
+        // Pequeña pausa para mostrar el inicio
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // PASO 1: Obtener contenido temático (0-20%)
+        updateProgress(5, "Conectando con el servidor...");
+        
+        // Simular tiempo de conexión
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        updateProgress(10, "Extrayendo contenido del Word...");
+        
+        const startTime = Date.now();
+        const contenidoTematico = await ExcelApi.getContenidoTematico(wordFileId);
+        
+        if (!contenidoTematico) {
+            throw new Error("No se pudo obtener el contenido del Word");
         }
+        
+        // Calcular tiempo transcurrido para ajustar progreso
+        const elapsedTime = Date.now() - startTime;
+        let progress = Math.min(20, 10 + Math.floor(elapsedTime / 200)); // Máximo 20%
+        
+        updateProgress(progress, "Contenido extraído correctamente");
+        await new Promise(resolve => setTimeout(resolve, 600));
+        
+        // PASO 2: Generar reactivos (20-60%)
+        updateProgress(25, "📋 Generando reactivos con IA...");
+        
+        const reactivosStartTime = Date.now();
+        const reactivosResult = await ExcelApi.generateExcelReactivos(contenidoTematico);
+        
+        // Calcular progreso basado en tiempo real (20-60%)
+        const reactivosElapsed = Date.now() - reactivosStartTime;
+        progress = Math.min(60, 25 + Math.floor(reactivosElapsed / 300)); // Máximo 60%
+        
+        updateProgress(progress, "Reactivos generados, organizando...");
+        await new Promise(resolve => setTimeout(resolve, 700));
+        
+        // PASO 3: Preparar datos para Excel (60-75%)
+        updateProgress(65, "Procesando datos...");
+        
+        // Pequeña pausa para procesamiento
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        let datosParaExcel = reactivosResult;
+        if (reactivosResult.materias) datosParaExcel = reactivosResult.materias;
+        else if (reactivosResult.data) datosParaExcel = reactivosResult.data;
+        else if (reactivosResult.reactivos) datosParaExcel = reactivosResult.reactivos;
+        
+        updateProgress(75, "Datos procesados, generando Excel...");
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // PASO 4: Generar Excel (75-95%)
+        updateProgress(80, "Creando archivo Excel...");
+        
+        const excelStartTime = Date.now();
+        const excelResult = await ExcelApi.generateExcel(datosParaExcel);
+        
+        // Progreso basado en tiempo de generación
+        const excelElapsed = Date.now() - excelStartTime;
+        progress = Math.min(95, 80 + Math.floor(excelElapsed / 200));
+        updateProgress(progress, "Archivo Excel generado");
+        
+        if (excelResult.fileId) {
+            // PASO 5: Descarga y actualización (95-100%)
+            updateProgress(97, "✅ Excel listo, descargando...");
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            await ExcelApi.downloadExcel(excelResult.fileId);
+            
+            updateProgress(99, "Actualizando lista de archivos...");
+            await new Promise(resolve => setTimeout(resolve, 600));
+            
+            await loadExcelFiles();
+            
+            updateProgress(100, "¡Proceso completado con éxito!");
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            hideProgressSpinner();
+            showToast('✅ Excel generado correctamente', 'success');
+        } else {
+            hideProgressSpinner();
+            showToast('✅ Proceso completado', 'success');
+        }
+        
+    } catch (error) {
+        hideProgressSpinner();
+        console.error('❌ Error:', error);
+        showErrorModal('Error al generar Excel', error.message);
+    }
+}
 
-        selectFileBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
+// ============================================
+// FUNCIÓN PARA SUBIR ARCHIVO (CON PROGRESO REAL)
+// ============================================
+document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const file = fileInput.files[0];
+    if (!file) {
+        showErrorModal('Archivo no seleccionado', 'Por favor selecciona un archivo PDF');
+        return;
+    }
 
-        changeFileBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
+    progressContainer.classList.remove('hidden');
+    showProgressSpinner("Subiendo archivo PDF...");
+    
+    // Progreso inicial
+    updateProgress(5, "Preparando archivo...");
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    try {
+        updateProgress(10, "Iniciando transferencia...");
+        
+        // Aquí podrías implementar el progreso real de subida si tu API lo soporta
+        // Por ahora usamos progreso basado en tiempo
+        const uploadStartTime = Date.now();
+        
+        const result = await PdfApi.uploadPdfFile(file);
+        
+        // Calcular tiempo de subida
+        const uploadElapsed = Date.now() - uploadStartTime;
+        let progress = Math.min(90, 10 + Math.floor(uploadElapsed / 100));
+        
+        if (result.success) {
+            progressBar.style.width = '100%';
+            progressPercent.textContent = '100%';
+            
+            // Completar progreso
+            progress = 95;
+            updateProgress(progress, "Archivo subido, procesando...");
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            updateProgress(98, "Actualizando lista de archivos...");
+            await loadFiles();
+            
+            updateProgress(100, "¡PDF subido correctamente!");
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            hideProgressSpinner();
+            showToast('✅ Documento subido correctamente', 'success');
+            resetForm();
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        hideProgressSpinner();
+        progressContainer.classList.add('hidden');
+        showErrorModal('Error al subir', error.message);
+    }
+});
 
-        dropZone.addEventListener('click', (e) => {
-            if (e.target !== selectFileBtn && e.target !== changeFileBtn) {
-                fileInput.click();
-            }
-        });
+// ============================================
+// FUNCIÓN CONFIRMAR ELIMINACIÓN (CON PROGRESO)
+// ============================================
+async function confirmDelete() {
+    if (!pendingDeleteId) return;
 
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('border-[#00002c]', 'bg-[#00002c]/5');
-        });
+    const deleteBtn = event.target.closest('button');
+    const originalText = deleteBtn.innerHTML;
+    deleteBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Eliminando...';
+    deleteBtn.disabled = true;
 
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('border-[#00002c]', 'bg-[#00002c]/5');
-        });
+    closeDeleteModal();
+    showProgressSpinner("Eliminando archivo...");
+    
+    // Progreso inicial
+    updateProgress(10, "Verificando archivo...");
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('border-[#00002c]', 'bg-[#00002c]/5');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type === 'application/pdf') {
-                handleFile(file);
+    if (pendingDeleteType === 'pdf') {
+        const idToDelete = pendingDeleteId;
+        console.log("Eliminando PDF:", idToDelete);
+        
+        updateProgress(30, "Eliminando PDF...");
+        const result = await PdfApi.deleteFile(idToDelete);
+        
+        if (result.success) {
+            updateProgress(70, "PDF eliminado, actualizando...");
+            await new Promise(resolve => setTimeout(resolve, 600));
+            
+            updateProgress(90, "Refrescando vista...");
+            await loadFiles();
+            
+            updateProgress(100, "¡Proceso completado!");
+            await new Promise(resolve => setTimeout(resolve, 600));
+            
+            hideProgressSpinner();
+            showToast('Documento PDF eliminado correctamente', 'success');
+        } else {
+            hideProgressSpinner();
+            showErrorModal('Error al eliminar', result.error);
+        }
+    } else if (pendingDeleteType === 'word') {
+        console.log("Eliminando Word generado:", pendingDeleteId);
+        
+        updateProgress(30, "Eliminando Word...");
+        const result = await WordApi.deleteGeneratedFile(pendingDeleteId);
+        
+        if (result.success) {
+            updateProgress(70, "Word eliminado, actualizando...");
+            await new Promise(resolve => setTimeout(resolve, 600));
+            
+            updateProgress(90, "Refrescando vista...");
+            await loadWordDocuments();
+            
+            updateProgress(100, "¡Proceso completado!");
+            await new Promise(resolve => setTimeout(resolve, 600));
+            
+            hideProgressSpinner();
+            showToast('Documento Word eliminado correctamente', 'success');
+        } else {
+            hideProgressSpinner();
+            showErrorModal('Error al eliminar Word', result.error);
+        }
+    } else if (pendingDeleteType === 'excel') {
+        console.log("Eliminando Excel generado:", pendingDeleteId);
+        
+        updateProgress(30, "Eliminando Excel...");
+        
+        try {
+            const result = await ExcelApi.deleteGeneratedExcel(pendingDeleteId);
+            
+            if (result) {
+                updateProgress(70, "Excel eliminado, actualizando...");
+                await new Promise(resolve => setTimeout(resolve, 600));
+                
+                updateProgress(90, "Refrescando vista...");
+                await loadExcelFiles();
+                
+                updateProgress(100, "¡Proceso completado!");
+                await new Promise(resolve => setTimeout(resolve, 600));
+                
+                hideProgressSpinner();
+                showToast('Documento Excel eliminado correctamente', 'success');
             } else {
-                showErrorModal('Archivo no válido', 'Solo se permiten archivos PDF');
+                hideProgressSpinner();
+                showErrorModal('Error al eliminar Excel', 'No se pudo eliminar el archivo');
             }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                handleFile(file);
-            }
-        });
-
-        function handleFile(file) {
-            if (file.type !== 'application/pdf') {
-                showErrorModal('Archivo no válido', 'Solo se permiten archivos PDF');
-                return;
-            }
-
-            if (file.size > 10 * 1024 * 1024) {
-                showErrorModal('Archivo muy grande', 'El archivo no puede ser mayor a 10MB');
-                return;
-            }
-
-            fileName.textContent = file.name;
-            fileSize.textContent = formatFileSize(file.size);
-            fileInfo.classList.remove('hidden');
+        } catch (error) {
+            hideProgressSpinner();
+            showErrorModal('Error al eliminar Excel', error.message);
         }
+    }
+    
+    deleteBtn.innerHTML = originalText;
+    deleteBtn.disabled = false;
+}
 
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+// ============================================
+// ACTUALIZAR ESTADÍSTICAS
+// ============================================
+function updateHeaderStats() {
+    updatePDFStats();
+    updateWordStats();
+    updateExcelStats();
+}
+
+function updatePDFStats() {
+    const totalPDFs = allFiles.length;
+    document.getElementById('totalDocumentosPDF').textContent = `${totalPDFs} ${totalPDFs === 1 ? 'PDF' : 'PDFs'}`;
+    document.getElementById('pdfCountBadge').textContent = `${totalPDFs} ${totalPDFs === 1 ? 'documento' : 'documentos'}`;
+}
+
+function updateWordStats() {
+    const totalWords = allWordFiles.length;
+    document.getElementById('totalDocumentosWord').textContent = `${totalWords} ${totalWords === 1 ? 'Word' : 'Words'}`;
+    document.getElementById('wordCountBadge').textContent = `${totalWords} ${totalWords === 1 ? 'documento' : 'documentos'}`;
+}
+
+function updateExcelStats() {
+    const totalExcels = allExcelFiles.length;
+    document.getElementById('excelCountBadge').textContent = `${totalExcels} ${totalExcels === 1 ? 'documento' : 'documentos'}`;
+}
+
+// ============================================
+// DESCARGAR ARCHIVO PDF
+// ============================================
+async function downloadFile(id, fileName) {
+    try {
+        const result = await PdfApi.downloadFileById(id);
+        if (!result.success) {
+            showErrorModal('Error al descargar', result.error);
         }
+    } catch (error) {
+        showErrorModal('Error de conexión', 'No se pudo conectar con el servidor');
+    }
+}
 
-        // ============================================
-// FUNCIONES PARA EXCEL (AÑADIR AL FINAL DEL SCRIPT)
+// ============================================
+// DESCARGAR ARCHIVO WORD
+// ============================================
+function downloadWordFile(fileId, fileName) {
+    showToast(`Descargando ${fileName}...`, 'success');
+    
+    // Construir URL de descarga para archivos Word generados
+    const downloadUrl = `${WordApi.baseUrl}/word-files/generated/${fileId}`;
+    
+    // Crear un enlace temporal para descargar
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = fileName || 'documento.docx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// ============================================
+// DESCARGAR ARCHIVO EXCEL
+// ============================================
+async function downloadExcelFile(fileId, fileName) {
+    try {
+        showToast(`Descargando ${fileName}...`, 'success');
+        await ExcelApi.downloadExcel(fileId);
+    } catch (error) {
+        showErrorModal('Error al descargar', error.message);
+    }
+}
+
+// ============================================
+// BÚSQUEDA EN TIEMPO REAL (PDF)
+// ============================================
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    
+    filteredFiles = allFiles.filter(file => {
+        const fileName = (file.originalName || file.path || '').toLowerCase();
+        return fileName.includes(searchTerm) || (file.id && file.id.includes(searchTerm));
+    });
+    
+    currentPage = 1;
+    renderTable();
+});
+
+// ============================================
+// BÚSQUEDA EN TIEMPO REAL (WORD)
+// ============================================
+document.getElementById('searchWordInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    
+    filteredWordFiles = allWordFiles.filter(file => {
+        const fileName = (file.originalName || '').toLowerCase();
+        const sourceName = (file.sourcePdfName || '').toLowerCase();
+        
+        return fileName.includes(searchTerm) || 
+               sourceName.includes(searchTerm) || 
+               (file.id && file.id.includes(searchTerm));
+    });
+    
+    currentWordPage = 1;
+    renderWordTable();
+});
+
+// ============================================
+// BÚSQUEDA EN TIEMPO REAL EXCEL
+// ============================================
+document.getElementById('searchExcelInput')?.addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    
+    filteredExcelFiles = allExcelFiles.filter(file => {
+        const fileName = (file.originalName || '').toLowerCase();
+        const wordOrigen = (file.sourceWordName || file.sourceFileName || '').toLowerCase();
+        
+        return fileName.includes(searchTerm) || wordOrigen.includes(searchTerm);
+    });
+    
+    currentExcelPage = 1;
+    renderExcelTable();
+});
+
+// ============================================
+// ACTUALIZAR PAGINACIÓN PDF
+// ============================================
+function updatePagination() {
+    const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
+    const paginationInfo = document.getElementById('paginationInfo');
+    const paginationControls = document.getElementById('paginationControls');
+    
+    const start = (currentPage - 1) * itemsPerPage + 1;
+    const end = Math.min(currentPage * itemsPerPage, filteredFiles.length);
+    
+    paginationInfo.innerHTML = `
+        <i class="fa-regular fa-file-pdf mr-2"></i>
+        Mostrando ${filteredFiles.length > 0 ? start : 0}-${end} de ${filteredFiles.length} resultados
+    `;
+
+    if (totalPages <= 1) {
+        paginationControls.innerHTML = '';
+        return;
+    }
+
+    let controls = '';
+    
+    controls += `
+        <button onclick="changePage(${currentPage - 1})" 
+            ${currentPage === 1 ? 'disabled' : ''}
+            class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-[#00002c] hover:text-white hover:border-[#00002c] transition-all ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+        </button>
+    `;
+
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            controls += `
+                <button onclick="changePage(${i})" 
+                    class="w-10 h-10 rounded-xl ${i === currentPage ? 'bg-gradient-to-r from-[#00002c] to-[#1a1a5c] text-white shadow-md' : 'border-2 border-gray-200 text-gray-500 hover:bg-[#00002c] hover:text-white hover:border-[#00002c]'} transition-all">
+                    ${i}
+                </button>
+            `;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+            controls += `<span class="w-10 h-10 flex items-center justify-center text-gray-400">...</span>`;
+        }
+    }
+
+    controls += `
+        <button onclick="changePage(${currentPage + 1})" 
+            ${currentPage === totalPages ? 'disabled' : ''}
+            class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-[#00002c] hover:text-white hover:border-[#00002c] transition-all ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    `;
+
+    paginationControls.innerHTML = controls;
+}
+
+// ============================================
+// ACTUALIZAR PAGINACIÓN WORD
+// ============================================
+function updateWordPagination() {
+    const totalPages = Math.ceil(filteredWordFiles.length / itemsPerPage);
+    const paginationInfo = document.getElementById('wordPaginationInfo');
+    const paginationControls = document.getElementById('wordPaginationControls');
+    
+    const start = (currentWordPage - 1) * itemsPerPage + 1;
+    const end = Math.min(currentWordPage * itemsPerPage, filteredWordFiles.length);
+    
+    paginationInfo.innerHTML = `
+        <i class="fa-regular fa-file-word mr-2 text-blue-500"></i>
+        Mostrando ${filteredWordFiles.length > 0 ? start : 0}-${end} de ${filteredWordFiles.length} resultados
+    `;
+
+    if (totalPages <= 1) {
+        paginationControls.innerHTML = '';
+        return;
+    }
+
+    let controls = '';
+    
+    controls += `
+        <button onclick="changeWordPage(${currentWordPage - 1})" 
+            ${currentWordPage === 1 ? 'disabled' : ''}
+            class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all ${currentWordPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+        </button>
+    `;
+
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentWordPage - 1 && i <= currentWordPage + 1)) {
+            controls += `
+                <button onclick="changeWordPage(${i})" 
+                    class="w-10 h-10 rounded-xl ${i === currentWordPage ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md' : 'border-2 border-gray-200 text-gray-500 hover:bg-blue-600 hover:text-white hover:border-blue-600'} transition-all">
+                    ${i}
+                </button>
+            `;
+        } else if (i === currentWordPage - 2 || i === currentWordPage + 2) {
+            controls += `<span class="w-10 h-10 flex items-center justify-center text-gray-400">...</span>`;
+        }
+    }
+
+    controls += `
+        <button onclick="changeWordPage(${currentWordPage + 1})" 
+            ${currentWordPage === totalPages ? 'disabled' : ''}
+            class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all ${currentWordPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    `;
+
+    paginationControls.innerHTML = controls;
+}
+
+// ============================================
+// ACTUALIZAR PAGINACIÓN EXCEL
+// ============================================
+function updateExcelPagination() {
+    const totalPages = Math.ceil(filteredExcelFiles.length / itemsPerPageExcel);
+    const paginationInfo = document.getElementById('excelPaginationInfo');
+    const paginationControls = document.getElementById('excelPaginationControls');
+    
+    if (!paginationInfo || !paginationControls) return;
+    
+    const start = (currentExcelPage - 1) * itemsPerPageExcel + 1;
+    const end = Math.min(currentExcelPage * itemsPerPageExcel, filteredExcelFiles.length);
+    
+    paginationInfo.innerHTML = `
+        <i class="fa-regular fa-file-excel mr-2 text-green-500"></i>
+        Mostrando ${filteredExcelFiles.length > 0 ? start : 0}-${end} de ${filteredExcelFiles.length} resultados
+    `;
+
+    if (totalPages <= 1) {
+        paginationControls.innerHTML = '';
+        return;
+    }
+
+    let controls = '';
+    
+    controls += `
+        <button onclick="changeExcelPage(${currentExcelPage - 1})" 
+            ${currentExcelPage === 1 ? 'disabled' : ''}
+            class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-green-600 hover:text-white hover:border-green-600 transition-all ${currentExcelPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+        </button>
+    `;
+
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentExcelPage - 1 && i <= currentExcelPage + 1)) {
+            controls += `
+                <button onclick="changeExcelPage(${i})" 
+                    class="w-10 h-10 rounded-xl ${i === currentExcelPage ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-md' : 'border-2 border-gray-200 text-gray-500 hover:bg-green-600 hover:text-white hover:border-green-600'} transition-all">
+                    ${i}
+                </button>
+            `;
+        } else if (i === currentExcelPage - 2 || i === currentExcelPage + 2) {
+            controls += `<span class="w-10 h-10 flex items-center justify-center text-gray-400">...</span>`;
+        }
+    }
+
+    controls += `
+        <button onclick="changeExcelPage(${currentExcelPage + 1})" 
+            ${currentExcelPage === totalPages ? 'disabled' : ''}
+            class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-green-600 hover:text-white hover:border-green-600 transition-all ${currentExcelPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    `;
+
+    paginationControls.innerHTML = controls;
+}
+
+// ============================================
+// CAMBIAR PÁGINA PDF
+// ============================================
+function changePage(page) {
+    currentPage = page;
+    renderTable();
+}
+
+// ============================================
+// CAMBIAR PÁGINA WORD
+// ============================================
+function changeWordPage(page) {
+    currentWordPage = page;
+    renderWordTable();
+}
+
+// ============================================
+// CAMBIAR PÁGINA EXCEL
+// ============================================
+function changeExcelPage(page) {
+    currentExcelPage = page;
+    renderExcelTable();
+}
+
+// ============================================
+// FUNCIONES PARA EXCEL
 // ============================================
 
 // CARGAR ARCHIVOS EXCEL DESDE API
 async function loadExcelFiles() {
     try {
+        // Solo mostrar spinner si no hay datos cargados previamente
+        if (allExcelFiles.length === 0) {
+            showProgressSpinner("Cargando archivos Excel...");
+        }
+        
         const tbody = document.getElementById('excelFilesTableBody');
         tbody.innerHTML = `
             <tr id="loadingExcelRow">
@@ -996,8 +1391,13 @@ async function loadExcelFiles() {
             filteredExcelFiles = [...allExcelFiles];
             renderExcelTable();
             updateExcelStats();
+            
+            if (allExcelFiles.length === 0) {
+                hideProgressSpinner();
+            }
         }
     } catch (error) {
+        hideProgressSpinner();
         console.error('Error cargando Excel:', error);
         document.getElementById('excelFilesTableBody').innerHTML = `
             <tr>
@@ -1091,73 +1491,7 @@ function renderExcelTable() {
     tbody.innerHTML = html;
     updateExcelPagination();
     updateExcelStats();
-}
-
-// ACTUALIZAR ESTADÍSTICAS EXCEL
-function updateExcelStats() {
-    const totalExcels = allExcelFiles.length;
-    document.getElementById('excelCountBadge').textContent = `${totalExcels} ${totalExcels === 1 ? 'documento' : 'documentos'}`;
-}
-
-// ACTUALIZAR PAGINACIÓN EXCEL
-function updateExcelPagination() {
-    const totalPages = Math.ceil(filteredExcelFiles.length / itemsPerPageExcel);
-    const paginationInfo = document.getElementById('excelPaginationInfo');
-    const paginationControls = document.getElementById('excelPaginationControls');
-    
-    if (!paginationInfo || !paginationControls) return;
-    
-    const start = (currentExcelPage - 1) * itemsPerPageExcel + 1;
-    const end = Math.min(currentExcelPage * itemsPerPageExcel, filteredExcelFiles.length);
-    
-    paginationInfo.innerHTML = `
-        <i class="fa-regular fa-file-excel mr-2 text-green-500"></i>
-        Mostrando ${filteredExcelFiles.length > 0 ? start : 0}-${end} de ${filteredExcelFiles.length} resultados
-    `;
-
-    if (totalPages <= 1) {
-        paginationControls.innerHTML = '';
-        return;
-    }
-
-    let controls = '';
-    
-    controls += `
-        <button onclick="changeExcelPage(${currentExcelPage - 1})" 
-            ${currentExcelPage === 1 ? 'disabled' : ''}
-            class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-green-600 hover:text-white hover:border-green-600 transition-all ${currentExcelPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}">
-            <i class="fa-solid fa-chevron-left text-xs"></i>
-        </button>
-    `;
-
-    for (let i = 1; i <= totalPages; i++) {
-        if (i === 1 || i === totalPages || (i >= currentExcelPage - 1 && i <= currentExcelPage + 1)) {
-            controls += `
-                <button onclick="changeExcelPage(${i})" 
-                    class="w-10 h-10 rounded-xl ${i === currentExcelPage ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-md' : 'border-2 border-gray-200 text-gray-500 hover:bg-green-600 hover:text-white hover:border-green-600'} transition-all">
-                    ${i}
-                </button>
-            `;
-        } else if (i === currentExcelPage - 2 || i === currentExcelPage + 2) {
-            controls += `<span class="w-10 h-10 flex items-center justify-center text-gray-400">...</span>`;
-        }
-    }
-
-    controls += `
-        <button onclick="changeExcelPage(${currentExcelPage + 1})" 
-            ${currentExcelPage === totalPages ? 'disabled' : ''}
-            class="w-10 h-10 rounded-xl border-2 border-gray-200 text-gray-500 hover:bg-green-600 hover:text-white hover:border-green-600 transition-all ${currentExcelPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
-            <i class="fa-solid fa-chevron-right text-xs"></i>
-        </button>
-    `;
-
-    paginationControls.innerHTML = controls;
-}
-
-// CAMBIAR PÁGINA EXCEL
-function changeExcelPage(page) {
-    currentExcelPage = page;
-    renderExcelTable();
+    hideProgressSpinner(); // Ocultar spinner cuando termina de renderizar
 }
 
 // FUNCIONES DE ACCIONES PARA EXCEL
@@ -1165,121 +1499,127 @@ function verExcel(fileId) {
     showToast('Visor de Excel próximamente', 'success');
 }
 
-async function downloadExcelFile(fileId, fileName) {
-    try {
-        showToast(`Descargando ${fileName}...`, 'success');
-        await ExcelApi.downloadExcel(fileId);
-    } catch (error) {
-        showErrorModal('Error al descargar', error.message);
-    }
-}
-
-function showDeleteExcelModal(id, fileName) {
-    pendingDeleteId = id;
-    pendingDeleteType = 'excel';
-    document.getElementById('deleteFileName').textContent = fileName || 'Documento Excel';
-    document.getElementById('deleteModalMessage').textContent = 'Esta acción no se puede deshacer y el archivo Excel se perderá permanentemente.';
-    document.getElementById('deleteConfirmModal').classList.remove('hidden');
-    
-    setTimeout(() => {
-        document.getElementById('deleteModalContent').classList.remove('scale-95');
-        document.getElementById('deleteModalContent').classList.add('scale-100');
-        
-        const header = document.querySelector('#deleteConfirmModal .shake-animation');
-        header.classList.remove('shake-animation');
-        void header.offsetWidth;
-        header.classList.add('shake-animation');
-    }, 10);
-    
-    document.body.style.overflow = 'hidden';
-}
-
 // REFRESCAR TABLA EXCEL
 function refreshExcelTable() {
     loadExcelFiles();
 }
 
-// GENERAR EXCEL DESDE WORD
-async function generateExcelFromWord(wordFileId, wordFileName) {
-    try {
-        showToast("📊 Procesando...", "success");
-        
-        // PASO 1
-        const contenidoTematico = await ExcelApi.getContenidoTematico(wordFileId);
-        showToast("📋 Generando reactivos...", "success");
-        
-        // PASO 2
-        const reactivosResult = await ExcelApi.generateExcelReactivos(contenidoTematico);
-        showToast("📈 Generando Excel final...", "success");
-        
-        // PASO 3
-        let datosParaExcel = reactivosResult;
-        if (reactivosResult.materias) datosParaExcel = reactivosResult.materias;
-        else if (reactivosResult.data) datosParaExcel = reactivosResult.data;
-        else if (reactivosResult.reactivos) datosParaExcel = reactivosResult.reactivos;
-        
-        const excelResult = await ExcelApi.generateExcel(datosParaExcel);
-        
-        if (excelResult.fileId) {
-            await ExcelApi.downloadExcel(excelResult.fileId);
-            await loadExcelFiles();
-            showToast(`✅ Excel generado correctamente`, 'success');
-        } else {
-            showToast('✅ Proceso completado', 'success');
-        }
-        
-    } catch (error) {
-        console.error('❌ Error:', error);
-        showErrorModal('Error al generar Excel', error.message);
-    }
+// ============================================
+// ELEMENTOS DEL DOM
+// ============================================
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const selectFileBtn = document.getElementById('selectFileBtn');
+const fileInfo = document.getElementById('fileInfo');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const changeFileBtn = document.getElementById('changeFileBtn');
+const progressContainer = document.getElementById('progressContainer');
+const progressBar = document.getElementById('progressBar');
+const progressPercent = document.getElementById('progressPercent');
+
+function resetForm() {
+    fileInfo.classList.add('hidden');
+    progressContainer.classList.add('hidden');
+    fileInput.value = '';
 }
 
-// BÚSQUEDA EN TIEMPO REAL EXCEL
-document.getElementById('searchExcelInput')?.addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    
-    filteredExcelFiles = allExcelFiles.filter(file => {
-        const fileName = (file.originalName || '').toLowerCase();
-        const wordOrigen = (file.sourceWordName || file.sourceFileName || '').toLowerCase();
-        
-        return fileName.includes(searchTerm) || wordOrigen.includes(searchTerm);
-    });
-    
-    currentExcelPage = 1;
-    renderExcelTable();
+selectFileBtn.addEventListener('click', () => {
+    fileInput.click();
 });
 
-        // ============================================
-        // CERRAR MODALES CON CLICK FUERA
-        // ============================================
-        window.addEventListener('click', (e) => {
-            const deleteModal = document.getElementById('deleteConfirmModal');
-            const errorModal = document.getElementById('errorModal');
-            const pdfModal = document.getElementById('pdfModal');
-            const wordModal = document.getElementById('wordModal');
-            
-            if (e.target === deleteModal) {
-                closeDeleteModal();
-            }
-            if (e.target === errorModal) {
-                closeErrorModal();
-            }
-            if (e.target === pdfModal) {
-                closePdfModal();
-            }
-            if (e.target === wordModal) {
-                closeWordModal();
-            }
-        });
+changeFileBtn.addEventListener('click', () => {
+    fileInput.click();
+});
 
-        // ============================================
-        // CERRAR MODALES CON TECLA ESC
-        // ============================================
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeDeleteModal();
-                closeErrorModal();
-                closePdfModal();
-                closeWordModal();
-            }
-        });
+dropZone.addEventListener('click', (e) => {
+    if (e.target !== selectFileBtn && e.target !== changeFileBtn) {
+        fileInput.click();
+    }
+});
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-[#00002c]', 'bg-[#00002c]/5');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('border-[#00002c]', 'bg-[#00002c]/5');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-[#00002c]', 'bg-[#00002c]/5');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === 'application/pdf') {
+        handleFile(file);
+    } else {
+        showErrorModal('Archivo no válido', 'Solo se permiten archivos PDF');
+    }
+});
+
+fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        handleFile(file);
+    }
+});
+
+function handleFile(file) {
+    if (file.type !== 'application/pdf') {
+        showErrorModal('Archivo no válido', 'Solo se permiten archivos PDF');
+        return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+        showErrorModal('Archivo muy grande', 'El archivo no puede ser mayor a 10MB');
+        return;
+    }
+
+    fileName.textContent = file.name;
+    fileSize.textContent = formatFileSize(file.size);
+    fileInfo.classList.remove('hidden');
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+// ============================================
+// CERRAR MODALES CON CLICK FUERA
+// ============================================
+window.addEventListener('click', (e) => {
+    const deleteModal = document.getElementById('deleteConfirmModal');
+    const errorModal = document.getElementById('errorModal');
+    const pdfModal = document.getElementById('pdfModal');
+    const wordModal = document.getElementById('wordModal');
+    
+    if (e.target === deleteModal) {
+        closeDeleteModal();
+    }
+    if (e.target === errorModal) {
+        closeErrorModal();
+    }
+    if (e.target === pdfModal) {
+        closePdfModal();
+    }
+    if (e.target === wordModal) {
+        closeWordModal();
+    }
+});
+
+// ============================================
+// CERRAR MODALES CON TECLA ESC
+// ============================================
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeDeleteModal();
+        closeErrorModal();
+        closePdfModal();
+        closeWordModal();
+    }
+});
