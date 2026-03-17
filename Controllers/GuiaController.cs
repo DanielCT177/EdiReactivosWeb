@@ -6,7 +6,11 @@ namespace EdiReactivosWeb.Controllers
     {
         public IActionResult Index()
         {
-            ViewData["Title"] = "Gestión de Guías PDF";
+            return View();
+        }
+
+        public IActionResult Upload()
+        {
             return View();
         }
     }

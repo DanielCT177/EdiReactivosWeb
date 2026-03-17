@@ -6,7 +6,6 @@ namespace EdiReactivosWeb.Controllers
     {
         public IActionResult Index()
         {
-            ViewData["Title"] = "Dashboard";
             return View();
         }
     }

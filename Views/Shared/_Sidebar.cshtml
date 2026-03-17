@@ -1,0 +1,87 @@
+@{
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+}
+
+<div class="fixed top-0 left-0 w-64 h-full bg-gradient-to-b from-[#00002c] to-[#1a1a5c] text-white shadow-2xl z-50">
+    <!-- Logo -->
+    <div class="flex items-center gap-3 px-6 py-8 border-b border-white/10">
+        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+            <i class="fa-solid fa-file-pdf text-white text-xl"></i>
+        </div>
+        <div>
+            <h2 class="font-bold text-xl">Guías PDF</h2>
+            <p class="text-xs text-white/50 mt-1">Sistema de gestión</p>
+        </div>
+    </div>
+
+    <!-- Menú de navegación -->
+    <nav class="px-4 py-6">
+        <a href="/Dashboard/Index" 
+           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all mb-2 @(currentController == "Dashboard" ? "bg-white/20" : "hover:bg-white/10")">
+            <i class="fa-solid fa-chart-pie w-5"></i>
+            <span class="font-medium">Dashboard</span>
+        </a>
+        
+        <a href="/Guia/Index" 
+           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all mb-2 @(currentController == "Guia" ? "bg-white/20" : "hover:bg-white/10")">
+            <i class="fa-solid fa-file-pdf w-5"></i>
+            <span class="font-medium">Guías PDF</span>
+        </a>
+    </nav>
+
+    <!-- Usuario dinámico -->
+    <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-user text-white"></i>
+            </div>
+            <div class="flex-1" id="userInfoContainer">
+                <p class="text-sm font-medium" id="userNameDisplay">Cargando...</p>
+                <p class="text-xs text-white/50" id="userEmailDisplay"></p>
+                <span class="text-xs bg-blue-600 px-2 py-0.5 rounded-full mt-1 inline-block" id="userRoleDisplay"></span>
+            </div>
+        </div>
+        
+        <!-- Botón de logout -->
+        <button onclick="logout()" 
+                class="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-white rounded-lg transition-all duration-200 text-sm">
+            <i class="fa-solid fa-sign-out-alt"></i>
+            <span>Cerrar sesión</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    function loadUserData() {
+        try {
+            const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+            const correo = localStorage.getItem('correo') || '';
+            const rol = localStorage.getItem('cardibot_role') || '';
+            
+            document.getElementById('userNameDisplay').textContent = usuario.nombreCompleto || 'Usuario';
+            document.getElementById('userEmailDisplay').textContent = correo || 'correo@ejemplo.com';
+            
+            const roleDisplay = document.getElementById('userRoleDisplay');
+            if (rol) {
+                roleDisplay.textContent = rol;
+                roleDisplay.style.display = 'inline-block';
+            } else {
+                roleDisplay.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error cargando datos:', error);
+        }
+    }
+
+    window.logout = function() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        localStorage.removeItem('correo');
+        localStorage.removeItem('cardibot_role');
+        sessionStorage.clear();
+        window.location.href = '/Auth/Login';
+    };
+
+    document.addEventListener('DOMContentLoaded', loadUserData);
+    window.addEventListener('pageshow', loadUserData);
+</script>
