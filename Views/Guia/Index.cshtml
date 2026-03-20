@@ -36,109 +36,293 @@
         </div>
     </div>
 
-    <!-- ===== SECCIÓN DE SUBIR PDF MEJORADA ===== -->
-    <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 p-8 mb-8 relative overflow-hidden">
-        <!-- Decoración sutil -->
-        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#00002c]/5 to-[#1a1a5c]/5 rounded-full -mr-10 -mt-10"></div>
-        
-        <div class="relative z-10">
-            <div class="flex items-center gap-4 mb-6">
-                <div class="w-14 h-14 bg-gradient-to-r from-[#00002c] to-[#1a1a5c] rounded-2xl shadow-lg flex items-center justify-center">
-                    <i class="fa-solid fa-cloud-arrow-up text-white text-2xl"></i>
-                </div>
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Subir nueva guía PDF</h2>
-                    <p class="text-gray-500">Arrastra o selecciona el archivo PDF que deseas subir</p>
-                </div>
-            </div>
-            
-            <!-- Área de subida mejorada -->
-            <div class="max-w-4xl mx-auto">
-                <form id="uploadForm">
-                    <!-- Campo de archivo con mejor diseño -->
-                    <div class="mb-6">
-                        <div id="dropZone" class="group relative border-3 border-dashed border-gray-200 rounded-2xl p-10 text-center bg-gradient-to-br from-gray-50 to-white hover:border-[#00002c] hover:bg-gradient-to-br hover:from-[#00002c]/5 hover:to-[#1a1a5c]/5 transition-all duration-300 cursor-pointer">
-                            <input type="file" id="fileInput" accept=".pdf" class="hidden">
-                            
-                            <!-- Icono animado -->
-                            <div class="relative inline-block mb-4">
-                                <div class="w-20 h-20 bg-gradient-to-r from-[#00002c]/10 to-[#1a1a5c]/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fa-solid fa-cloud-arrow-up text-[#00002c] text-4xl group-hover:animate-bounce"></i>
-                                </div>
-                                <div class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></div>
-                            </div>
-                            
-                            <p class="text-gray-700 text-lg font-medium mb-2">
-                                Arrastra tu archivo PDF aquí
-                            </p>
-                            <p class="text-gray-400 text-sm mb-4">
-                                o haz clic para seleccionar
-                            </p>
-                            
-                            <button type="button" id="selectFileBtn" class="px-8 py-3 bg-gradient-to-r from-[#00002c] to-[#1a1a5c] text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 btn-shine">
-                                <i class="fa-solid fa-folder-open mr-2"></i>
-                                Seleccionar archivo
-                            </button>
-
-                            <!-- Info del archivo seleccionado -->
-                            <div id="fileInfo" class="hidden mt-6">
-                                <div class="flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100 max-w-md mx-auto">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                                            <i class="fa-solid fa-file-pdf text-red-600 text-xl"></i>
-                                        </div>
-                                        <div class="text-left">
-                                            <p id="fileName" class="font-semibold text-gray-800">nombre-del-archivo.pdf</p>
-                                            <p id="fileSize" class="text-sm text-gray-500 flex items-center gap-2">
-                                                <i class="fa-regular fa-circle-check text-green-500"></i>
-                                                Listo para subir
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button type="button" id="changeFileBtn" class="w-10 h-10 rounded-xl text-gray-400 hover:text-[#00002c] hover:bg-white transition-all">
-                                        <i class="fa-solid fa-pencil"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Barra de progreso mejorada -->
-                            <div id="progressContainer" class="hidden mt-6 max-w-md mx-auto">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-sm font-medium text-gray-600 flex items-center gap-2">
-                                        <i class="fa-solid fa-spinner fa-spin text-[#00002c]"></i>
-                                        Subiendo archivo...
-                                    </span>
-                                    <span id="progressPercent" class="text-sm font-bold text-[#00002c] bg-[#00002c]/10 px-3 py-1 rounded-full">0%</span>
-                                </div>
-                                <div class="h-3 bg-gray-100 rounded-full overflow-hidden p-0.5">
-                                    <div id="progressBar" class="h-full bg-gradient-to-r from-[#00002c] to-[#1a1a5c] rounded-full transition-all duration-300" style="width: 0%"></div>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center justify-center gap-4 mt-4 text-xs text-gray-400">
-                                <span><i class="fa-solid fa-circle-check text-green-500 mr-1"></i>PDF</span>
-                                <span><i class="fa-solid fa-circle-check text-green-500 mr-1"></i>Máx 10MB</span>
-                                <span><i class="fa-solid fa-circle-check text-green-500 mr-1"></i>Seguro</span>
-                            </div>
+    <!-- ===== PRIMERA FILA: SUBIR DOCUMENTOS Y TABLA PDF ===== -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <!-- ===== COLUMNA IZQUIERDA: SUBIR DOCUMENTOS ===== -->
+        <div class="lg:col-span-1">
+            <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 p-8 relative overflow-hidden h-full">
+                <!-- Decoración sutil -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#00002c]/5 to-[#1a1a5c]/5 rounded-full -mr-10 -mt-10"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 bg-gradient-to-r from-[#00002c] to-[#1a1a5c] rounded-2xl shadow-lg flex items-center justify-center">
+                            <i class="fa-solid fa-cloud-arrow-up text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Subir nueva guía PDF</h2>
+                            <p class="text-gray-500">Arrastra o selecciona el archivo PDF</p>
                         </div>
                     </div>
+                    
+                    <!-- Área de subida mejorada -->
+                    <div class="w-full">
+                        <form id="uploadForm">
+                            <!-- Campo de archivo con mejor diseño -->
+                            <div class="mb-6">
+                                <div id="dropZone" class="group relative border-3 border-dashed border-gray-200 rounded-2xl p-8 text-center bg-gradient-to-br from-gray-50 to-white hover:border-[#00002c] hover:bg-gradient-to-br hover:from-[#00002c]/5 hover:to-[#1a1a5c]/5 transition-all duration-300 cursor-pointer">
+                                    <input type="file" id="fileInput" accept=".pdf" class="hidden">
+                                    
+                                    <!-- Icono animado -->
+                                    <div class="relative inline-block mb-4">
+                                        <div class="w-20 h-20 bg-gradient-to-r from-[#00002c]/10 to-[#1a1a5c]/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                            <i class="fa-solid fa-cloud-arrow-up text-[#00002c] text-4xl group-hover:animate-bounce"></i>
+                                        </div>
+                                        <div class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></div>
+                                    </div>
+                                    
+                                    <p class="text-gray-700 text-lg font-medium mb-2">
+                                        Arrastra tu archivo PDF aquí
+                                    </p>
+                                    <p class="text-gray-400 text-sm mb-4">
+                                        o haz clic para seleccionar
+                                    </p>
+                                    
+                                    <button type="button" id="selectFileBtn" class="px-6 py-3 bg-gradient-to-r from-[#00002c] to-[#1a1a5c] text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 btn-shine text-sm">
+                                        <i class="fa-solid fa-folder-open mr-2"></i>
+                                        Seleccionar archivo
+                                    </button>
 
-                    <!-- Botones mejorados -->
-                    <div class="flex justify-end gap-3">
-                        <button type="button" onclick="resetForm()" class="px-6 py-3 border-2 border-gray-200 rounded-xl text-gray-600 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2">
-                            <i class="fa-solid fa-times"></i>
-                            Cancelar
-                        </button>
-                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-[#00002c] to-[#1a1a5c] text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex items-center gap-2 btn-shine">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            Subir guía
-                        </button>
+                                    <!-- Info del archivo seleccionado -->
+                                    <div id="fileInfo" class="hidden mt-6">
+                                        <div class="flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-xl border border-green-100">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                                                    <i class="fa-solid fa-file-pdf text-red-600 text-lg"></i>
+                                                </div>
+                                                <div class="text-left">
+                                                    <p id="fileName" class="font-semibold text-gray-800 text-sm">nombre-del-archivo.pdf</p>
+                                                    <p id="fileSize" class="text-xs text-gray-500 flex items-center gap-2">
+                                                        <i class="fa-regular fa-circle-check text-green-500"></i>
+                                                        Listo para subir
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button type="button" id="changeFileBtn" class="w-8 h-8 rounded-xl text-gray-400 hover:text-[#00002c] hover:bg-white transition-all">
+                                                <i class="fa-solid fa-pencil"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Barra de progreso mejorada -->
+                                    <div id="progressContainer" class="hidden mt-6">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-xs font-medium text-gray-600 flex items-center gap-2">
+                                                <i class="fa-solid fa-spinner fa-spin text-[#00002c]"></i>
+                                                Subiendo archivo...
+                                            </span>
+                                            <span id="progressPercent" class="text-xs font-bold text-[#00002c] bg-[#00002c]/10 px-3 py-1 rounded-full">0%</span>
+                                        </div>
+                                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden p-0.5">
+                                            <div id="progressBar" class="h-full bg-gradient-to-r from-[#00002c] to-[#1a1a5c] rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-center gap-4 mt-4 text-xs text-gray-400">
+                                        <span><i class="fa-solid fa-circle-check text-green-500 mr-1"></i>PDF</span>
+                                        <span><i class="fa-solid fa-circle-check text-green-500 mr-1"></i>Máx 10MB</span>
+                                        <span><i class="fa-solid fa-circle-check text-green-500 mr-1"></i>Seguro</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones mejorados -->
+                            <div class="flex justify-end gap-3">
+                                <button type="button" onclick="resetForm()" class="px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-600 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2 text-sm">
+                                    <i class="fa-solid fa-times"></i>
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="px-5 py-2 bg-gradient-to-r from-[#00002c] to-[#1a1a5c] text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex items-center gap-2 btn-shine text-sm">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    Subir guía
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== COLUMNA DERECHA: TABLA PDF ===== -->
+        <div class="lg:col-span-2">
+            <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 overflow-hidden h-full">
+                <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-gradient-to-r from-[#00002c]/10 to-[#1a1a5c]/10 rounded-xl flex items-center justify-center">
+                                <i class="fa-solid fa-file-pdf text-[#00002c]"></i>
+                            </div>
+                            <h2 class="text-xl font-semibold text-gray-800">Guías PDF</h2>
+                            <span class="bg-[#00002c]/10 text-[#00002c] text-xs px-2 py-1 rounded-full font-medium" id="pdfCountBadge">0 documentos</span>
+                        </div>
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="searchInput" placeholder="Buscar documentos PDF..." class="pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#00002c] focus:ring-4 focus:ring-[#00002c]/10 w-64">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla PDF con scroll -->
+                <div class="overflow-x-auto" style="max-height: 500px;">
+                    <table class="w-full">
+                        <thead class="bg-gradient-to-r from-gray-100 to-gray-50 sticky top-0 z-10">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="filesTableBody" class="divide-y divide-gray-100">
+                            <!-- Los datos se cargarán dinámicamente -->
+                            <tr id="loadingRow">
+                                <td colspan="5" class="px-6 py-8 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <i class="fa-solid fa-spinner fa-spin text-[#00002c] text-3xl mb-3"></i>
+                                        <p class="text-gray-500">Cargando documentos PDF...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación PDF -->
+                <div class="px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
+                    <p class="text-sm text-gray-500" id="paginationInfo">
+                        <i class="fa-regular fa-file-pdf mr-2"></i>
+                        Cargando...
+                    </p>
+                    <div class="flex gap-2" id="paginationControls"></div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- ===== SEGUNDA FILA: TABLAS DE WORD Y EXCEL ===== -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- ===== TABLA DE DOCUMENTOS WORD GENERADOS ===== -->
+        <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-600/10 to-blue-700/10 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-file-word text-blue-600"></i>
+                        </div>
+                        <h2 class="text-xl font-semibold text-gray-800">Documentos Word Generados</h2>
+                        <span class="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full font-medium">Generados con IA</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full font-medium" id="wordCountBadge">0 documentos</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="searchWordInput" placeholder="Buscar documentos Word..." class="pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 w-64">
+                        </div>
+                        <button onclick="loadWordDocuments()" class="px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 btn-shine flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            Actualizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla Word con scroll -->
+            <div class="overflow-x-auto" style="max-height: 400px;">
+                <table class="w-full">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-50 sticky top-0 z-10">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre del Word</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha generación</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">PDF Origen</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="wordFilesTableBody" class="divide-y divide-gray-100">
+                        <!-- Los datos se cargarán dinámicamente -->
+                        <tr id="loadingWordRow">
+                            <td colspan="5" class="px-6 py-8 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <i class="fa-solid fa-spinner fa-spin text-blue-600 text-3xl mb-3"></i>
+                                    <p class="text-gray-500">Cargando documentos Word generados...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación Word -->
+            <div class="px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
+                <p class="text-sm text-gray-500" id="wordPaginationInfo">
+                    <i class="fa-regular fa-file-word mr-2 text-blue-500"></i>
+                    Cargando...
+                </p>
+                <div class="flex gap-2" id="wordPaginationControls"></div>
+            </div>
+        </div>
+
+        <!-- ===== TABLA DE ARCHIVOS EXCEL GENERADOS ===== -->
+        <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-green-600/10 to-green-700/10 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-file-excel text-green-600"></i>
+                        </div>
+                        <h2 class="text-xl font-semibold text-gray-800">Archivos Excel Generados</h2>
+                        <span class="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full font-medium">Generados desde Word</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full font-medium" id="excelCountBadge">0 documentos</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="searchExcelInput" placeholder="Buscar archivos Excel..." class="pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 w-64">
+                        </div>
+                        <button onclick="loadExcelFiles()" class="px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 btn-shine flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            Actualizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla Excel con scroll -->
+            <div class="overflow-x-auto" style="max-height: 400px;">
+                <table class="w-full">
+                    <thead class="bg-gradient-to-r from-gray-100 to-gray-50 sticky top-0 z-10">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre del Excel</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha generación</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Word Origen</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="excelFilesTableBody" class="divide-y divide-gray-100">
+                        <!-- Los datos se cargarán dinámicamente desde JavaScript -->
+                        <tr id="loadingExcelRow">
+                            <td colspan="5" class="px-6 py-8 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <i class="fa-solid fa-spinner fa-spin text-green-600 text-3xl mb-3"></i>
+                                    <p class="text-gray-500">Cargando archivos Excel...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación Excel -->
+            <div class="px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
+                <p class="text-sm text-gray-500" id="excelPaginationInfo">
+                    <i class="fa-regular fa-file-excel mr-2 text-green-500"></i>
+                    Cargando...
+                </p>
+                <div class="flex gap-2" id="excelPaginationControls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODALES (fuera del grid) ===== -->
     <!-- ===== MODAL DE PREVISUALIZACIÓN PDF ===== -->
     <div id="pdfModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden modal-transition">
         <div class="bg-white rounded-2xl w-11/12 h-5/6 max-w-6xl mx-auto overflow-hidden shadow-2xl transform scale-95 transition-all duration-300" id="pdfModalContent">
@@ -199,10 +383,10 @@
         </div>
     </div>
 
-    <!-- ===== MODAL DE ELIMINACIÓN MEJORADO (CONFIRMACIÓN) ===== -->
+    <!-- ===== MODAL DE ELIMINACIÓN MEJORADO ===== -->
     <div id="deleteConfirmModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden modal-transition">
         <div class="bg-white rounded-2xl max-w-md w-full mx-4 overflow-hidden shadow-2xl transform transition-all duration-300 scale-95 delete-modal" id="deleteModalContent">
-            <!-- Header con gradiente rojo y efecto de vibración -->
+            <!-- Header con gradiente rojo -->
             <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-5 shake-animation">
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
@@ -254,186 +438,8 @@
             </div>
         </div>
     </div>
-
-
-    <!-- ===== SECCIÓN DE TABLAS ===== -->
-    <div class="space-y-8">
-        <!-- ===== TABLA DE GUÍAS PDF ===== -->
-        <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-r from-[#00002c]/10 to-[#1a1a5c]/10 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-file-pdf text-[#00002c]"></i>
-                        </div>
-                        <h2 class="text-xl font-semibold text-gray-800">Guías PDF</h2>
-                        <span class="bg-[#00002c]/10 text-[#00002c] text-xs px-2 py-1 rounded-full font-medium" id="pdfCountBadge">0 documentos</span>
-                    </div>
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="searchInput" placeholder="Buscar documentos PDF..." class="pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#00002c] focus:ring-4 focus:ring-[#00002c]/10 w-80">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabla PDF -->
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gradient-to-r from-gray-100 to-gray-50">
-                        <tr>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="filesTableBody" class="divide-y divide-gray-100">
-                        <!-- Los datos se cargarán dinámicamente -->
-                        <tr id="loadingRow">
-                            <td colspan="5" class="px-6 py-8 text-center">
-                                <div class="flex flex-col items-center justify-center">
-                                    <i class="fa-solid fa-spinner fa-spin text-[#00002c] text-3xl mb-3"></i>
-                                    <p class="text-gray-500">Cargando documentos PDF...</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Paginación PDF -->
-            <div class="px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
-                <p class="text-sm text-gray-500" id="paginationInfo">
-                    <i class="fa-regular fa-file-pdf mr-2"></i>
-                    Cargando...
-                </p>
-                <div class="flex gap-2" id="paginationControls"></div>
-            </div>
-        </div>
-
-        <!-- ===== TABLA DE DOCUMENTOS WORD GENERADOS ===== -->
-        <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-r from-blue-600/10 to-blue-700/10 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-file-word text-blue-600"></i>
-                        </div>
-                        <h2 class="text-xl font-semibold text-gray-800">Documentos Word Generados</h2>
-                        <span class="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full font-medium">Generados con IA</span>
-                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full font-medium" id="wordCountBadge">0 documentos</span>
-                    </div>
-                    <div class="flex gap-3">
-                        <div class="relative">
-                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="searchWordInput" placeholder="Buscar documentos Word..." class="pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 w-80">
-                        </div>
-                        <button onclick="loadWordDocuments()" class="px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 btn-shine flex items-center gap-2">
-                            <i class="fa-solid fa-rotate-right"></i>
-                            Actualizar
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabla Word con columna de PDF origen -->
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gradient-to-r from-gray-100 to-gray-50">
-                        <tr>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre del Word</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha generación</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">PDF Origen</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="wordFilesTableBody" class="divide-y divide-gray-100">
-                        <!-- Los datos se cargarán dinámicamente -->
-                        <tr id="loadingWordRow">
-                            <td colspan="5" class="px-6 py-8 text-center">
-                                <div class="flex flex-col items-center justify-center">
-                                    <i class="fa-solid fa-spinner fa-spin text-blue-600 text-3xl mb-3"></i>
-                                    <p class="text-gray-500">Cargando documentos Word generados...</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Paginación Word -->
-            <div class="px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
-                <p class="text-sm text-gray-500" id="wordPaginationInfo">
-                    <i class="fa-regular fa-file-word mr-2 text-blue-500"></i>
-                    Cargando...
-                </p>
-                <div class="flex gap-2" id="wordPaginationControls"></div>
-            </div>
-        </div>
-
-        <!-- ===== TABLA DE ARCHIVOS EXCEL GENERADOS ===== -->
-        <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 overflow-hidden mt-8">
-            <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-r from-green-600/10 to-green-700/10 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-file-excel text-green-600"></i>
-                        </div>
-                        <h2 class="text-xl font-semibold text-gray-800">Archivos Excel Generados</h2>
-                        <span class="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full font-medium">Generados desde Word</span>
-                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full font-medium" id="excelCountBadge">0 documentos</span>
-                    </div>
-                    <div class="flex gap-3">
-                        <div class="relative">
-                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="searchExcelInput" placeholder="Buscar archivos Excel..." class="pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-600 focus:ring-4 focus:ring-green-600/10 w-80">
-                        </div>
-                        <button onclick="loadExcelFiles()" class="px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 btn-shine flex items-center gap-2">
-                            <i class="fa-solid fa-rotate-right"></i>
-                            Actualizar
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabla Excel -->
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gradient-to-r from-gray-100 to-gray-50">
-                        <tr>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nombre del Excel</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha generación</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Word Origen</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="excelFilesTableBody" class="divide-y divide-gray-100">
-                        <!-- Los datos se cargarán dinámicamente desde JavaScript -->
-                        <tr id="loadingExcelRow">
-                            <td colspan="5" class="px-6 py-8 text-center">
-                                <div class="flex flex-col items-center justify-center">
-                                    <i class="fa-solid fa-spinner fa-spin text-green-600 text-3xl mb-3"></i>
-                                    <p class="text-gray-500">Cargando archivos Excel...</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Paginación Excel -->
-            <div class="px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
-                <p class="text-sm text-gray-500" id="excelPaginationInfo">
-                    <i class="fa-regular fa-file-excel mr-2 text-green-500"></i>
-                    Cargando...
-                </p>
-                <div class="flex gap-2" id="excelPaginationControls"></div>
-            </div>
-        </div>
-    </div>
 </div>
 
 @section Scripts {
-            <script src="~/js/guia/guia-script.js"></script>
-
+    <script src="~/js/guia/guia-script.js"></script>
 }
