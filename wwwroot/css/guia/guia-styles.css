@@ -1,4 +1,4 @@
-/* Animación de vibración para el modal de eliminar */
+  /* Animación de vibración para el modal de eliminar */
     @keyframes shake {
         0%, 100% { transform: translateX(0); }
         10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -45,26 +45,44 @@
         transform: scale(1.1) rotate(5deg);
     }
 
+    /* ===== NUEVOS ESTILOS PARA EL SPINNER ===== */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
-    /* Spinner global sin fondo blanco */
-#globalSpinner {
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 9999;
-}
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
 
-/* Prevenir scroll cuando el spinner está activo */
-body.overflow-hidden {
-    overflow: hidden;
-}
+    .loading-spinner-large {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #2563eb;
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        animation: spin 1s linear infinite;
+    }
 
-/* Estilos para el círculo de progreso */
-#progressCircle {
-    transition: stroke-dashoffset 0.3s ease-out;
-    filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
-}
+    .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
 
-/* Animación de pulso para el texto */
-.text-white {
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
+    /* Estilos para el spinner modal */
+    #globalSpinner {
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 9999;
+    }
+
+    #globalSpinner .bg-white {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Prevenir scroll cuando el spinner está activo */
+    body.overflow-hidden {
+        overflow: hidden;
+    }
