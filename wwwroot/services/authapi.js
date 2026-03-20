@@ -1,5 +1,5 @@
 // services/authapi.js
-import { redirectBasedOnRole } from '../wwwroot/js/roles/index.js';
+import { redirectBasedOnRole } from '/js/roles/index.js';
 
 const API_URL = "https://www.uttt.edu.mx/AdministradoresCardibot/api/Auth";
 const LOGIN_ENDPOINT = "/login";
