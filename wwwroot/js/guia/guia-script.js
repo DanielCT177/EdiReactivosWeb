@@ -33,7 +33,7 @@ let activeProcesses = 0;
 // ============================================
 function showProgressSpinner(message = 'Procesando...') {
     activeProcesses++;
-    
+
     // Crear o mostrar el spinner global
     let spinner = document.getElementById('globalSpinner');
     if (!spinner) {
@@ -80,7 +80,7 @@ function showProgressSpinner(message = 'Procesando...') {
             </div>
         `;
         document.body.appendChild(spinner);
-        
+
         // Animación de entrada
         setTimeout(() => {
             document.getElementById('spinnerContent').classList.remove('scale-95');
@@ -91,7 +91,7 @@ function showProgressSpinner(message = 'Procesando...') {
         document.getElementById('spinnerSubmessage').textContent = '';
         resetProgress();
         spinner.classList.remove('hidden');
-        
+
         // Animación de entrada
         const content = document.getElementById('spinnerContent');
         content.classList.remove('scale-100');
@@ -101,14 +101,14 @@ function showProgressSpinner(message = 'Procesando...') {
             content.classList.add('scale-100');
         }, 50);
     }
-    
+
     document.body.style.overflow = 'hidden';
 }
 
 function updateProgress(percentage, message = null, submessage = null) {
     // Asegurar que el porcentaje esté entre 0 y 100
     percentage = Math.min(100, Math.max(0, percentage));
-    
+
     // Actualizar círculo de progreso
     const circle = document.getElementById('progressCircle');
     if (circle) {
@@ -117,7 +117,7 @@ function updateProgress(percentage, message = null, submessage = null) {
         const offset = circumference - (percentage / 100) * circumference;
         circle.style.strokeDasharray = `${circumference}`;
         circle.style.strokeDashoffset = offset;
-        
+
         // Cambiar color según el progreso
         if (percentage < 30) {
             circle.style.stroke = '#3b82f6';
@@ -130,19 +130,19 @@ function updateProgress(percentage, message = null, submessage = null) {
             circle.style.filter = 'drop-shadow(0 0 10px #10b981)';
         }
     }
-    
+
     // Actualizar texto del porcentaje
     const percentText = document.getElementById('progressPercentage');
     if (percentText) {
         percentText.textContent = `${Math.round(percentage)}%`;
     }
-    
+
     // Actualizar mensajes
     if (message) {
         const msgEl = document.getElementById('spinnerMessage');
         if (msgEl) msgEl.textContent = message;
     }
-    
+
     if (submessage) {
         const subEl = document.getElementById('spinnerSubmessage');
         if (subEl) subEl.textContent = submessage;
@@ -155,7 +155,7 @@ function resetProgress() {
 
 function hideProgressSpinner() {
     activeProcesses = Math.max(0, activeProcesses - 1);
-    
+
     if (activeProcesses === 0) {
         const spinner = document.getElementById('globalSpinner');
         if (spinner) {
@@ -164,7 +164,7 @@ function hideProgressSpinner() {
                 content.classList.remove('scale-100');
                 content.classList.add('scale-95');
             }
-            
+
             setTimeout(() => {
                 spinner.classList.add('hidden');
                 document.body.style.overflow = 'auto';
@@ -181,26 +181,26 @@ function hideProgressSpinner() {
 function openPdfModal(fileId, fileName) {
     currentFileId = fileId;
     currentFileName = fileName;
-    
+
     const pdfUrl = `${PdfApi.baseUrl}/pdf-files/${fileId}`;
-    
+
     document.getElementById('modalFileName').textContent = fileName;
     document.getElementById('pdfViewer').src = pdfUrl;
     document.getElementById('pdfModal').classList.remove('hidden');
-    
+
     // Animación de entrada
     setTimeout(() => {
         document.getElementById('pdfModalContent').classList.remove('scale-95');
         document.getElementById('pdfModalContent').classList.add('scale-100');
     }, 10);
-    
+
     document.body.style.overflow = 'hidden';
 }
 
 function closePdfModal() {
     document.getElementById('pdfModalContent').classList.remove('scale-100');
     document.getElementById('pdfModalContent').classList.add('scale-95');
-    
+
     setTimeout(() => {
         document.getElementById('pdfModal').classList.add('hidden');
         document.getElementById('pdfViewer').src = '';
@@ -213,24 +213,24 @@ function closePdfModal() {
 // ============================================
 function openWordModal(fileName, fileId) {
     document.getElementById('wordModalFileName').textContent = fileName || 'Documento Word';
-    
+
     // Aquí podrías cargar una vista previa si está disponible
     // Por ahora mostramos el mensaje de vista previa no disponible
-    
+
     document.getElementById('wordModal').classList.remove('hidden');
-    
+
     setTimeout(() => {
         document.getElementById('wordModalContent').classList.remove('scale-95');
         document.getElementById('wordModalContent').classList.add('scale-100');
     }, 10);
-    
+
     document.body.style.overflow = 'hidden';
 }
 
 function closeWordModal() {
     document.getElementById('wordModalContent').classList.remove('scale-100');
     document.getElementById('wordModalContent').classList.add('scale-95');
-    
+
     setTimeout(() => {
         document.getElementById('wordModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
@@ -246,19 +246,19 @@ function showDeleteModal(id, fileName) {
     document.getElementById('deleteFileName').textContent = fileName || 'Documento seleccionado';
     document.getElementById('deleteModalMessage').textContent = 'Esta acción no se puede deshacer y el archivo PDF se perderá permanentemente.';
     document.getElementById('deleteConfirmModal').classList.remove('hidden');
-    
+
     // Animación de entrada y vibración
     setTimeout(() => {
         document.getElementById('deleteModalContent').classList.remove('scale-95');
         document.getElementById('deleteModalContent').classList.add('scale-100');
-        
+
         // Agregar clase de vibración al header
         const header = document.querySelector('#deleteConfirmModal .shake-animation');
         header.classList.remove('shake-animation');
         void header.offsetWidth; // Reiniciar animación
         header.classList.add('shake-animation');
     }, 10);
-    
+
     document.body.style.overflow = 'hidden';
 }
 
@@ -268,17 +268,17 @@ function showDeleteWordModal(id, fileName) {
     document.getElementById('deleteFileName').textContent = fileName || 'Documento seleccionado';
     document.getElementById('deleteModalMessage').textContent = 'Esta acción no se puede deshacer y el documento Word generado se perderá permanentemente.';
     document.getElementById('deleteConfirmModal').classList.remove('hidden');
-    
+
     setTimeout(() => {
         document.getElementById('deleteModalContent').classList.remove('scale-95');
         document.getElementById('deleteModalContent').classList.add('scale-100');
-        
+
         const header = document.querySelector('#deleteConfirmModal .shake-animation');
         header.classList.remove('shake-animation');
         void header.offsetWidth;
         header.classList.add('shake-animation');
     }, 10);
-    
+
     document.body.style.overflow = 'hidden';
 }
 
@@ -288,28 +288,28 @@ function showDeleteExcelModal(id, fileName) {
     document.getElementById('deleteFileName').textContent = fileName || 'Documento Excel';
     document.getElementById('deleteModalMessage').textContent = 'Esta acción no se puede deshacer y el archivo Excel se perderá permanentemente.';
     document.getElementById('deleteConfirmModal').classList.remove('hidden');
-    
+
     setTimeout(() => {
         document.getElementById('deleteModalContent').classList.remove('scale-95');
         document.getElementById('deleteModalContent').classList.add('scale-100');
-        
+
         const header = document.querySelector('#deleteConfirmModal .shake-animation');
         header.classList.remove('shake-animation');
         void header.offsetWidth;
         header.classList.add('shake-animation');
     }, 10);
-    
+
     document.body.style.overflow = 'hidden';
 }
 
 function closeDeleteModal() {
     document.getElementById('deleteModalContent').classList.remove('scale-100');
     document.getElementById('deleteModalContent').classList.add('scale-95');
-    
+
     setTimeout(() => {
         document.getElementById('deleteConfirmModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
-        pendingDeleteId = null;
+        // NO limpiar pendingDeleteId aquí
     }, 200);
 }
 
@@ -323,7 +323,7 @@ function showToast(message, type = 'success') {
         toast.id = 'toastNotification';
         document.body.appendChild(toast);
     }
-    
+
     if (type === 'success') {
         toast.className = 'fixed bottom-4 right-4 bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 translate-y-20 opacity-0 z-50 flex items-center gap-3';
         toast.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + message;
@@ -331,11 +331,11 @@ function showToast(message, type = 'success') {
         toast.className = 'fixed bottom-4 right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 translate-y-20 opacity-0 z-50 flex items-center gap-3';
         toast.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + message;
     }
-    
+
     setTimeout(() => {
         toast.classList.remove('translate-y-20', 'opacity-0');
     }, 100);
-    
+
     setTimeout(() => {
         toast.classList.add('translate-y-20', 'opacity-0');
     }, 3000);
@@ -360,10 +360,10 @@ function closeErrorModal() {
 // ============================================
 // CARGAR ARCHIVOS AL INICIAR
 // ============================================
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     await loadFiles();
     await loadWordDocuments();
-    await loadExcelFiles();
+    await loadExcelFiles(true); // Mostrar loading en la carga inicial
     updateHeaderStats();
 });
 
@@ -373,10 +373,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 async function loadFiles() {
     try {
         const result = await PdfApi.getFiles();
-        
+
         if (result.success) {
             allFiles = result.files || [];
-            
+
             // Crear un mapa de PDFs por ID para referencia rápida
             pdfFilesMap = {};
             allFiles.forEach(file => {
@@ -384,7 +384,7 @@ async function loadFiles() {
                     pdfFilesMap[file.id] = file;
                 }
             });
-            
+
             filteredFiles = [...allFiles];
             renderTable();
             updatePDFStats();
@@ -416,10 +416,10 @@ function setWordLoading(show) {
 function createLoadingRow() {
     const tbody = document.getElementById('wordFilesTableBody');
     if (!tbody) return;
-    
+
     // Verificar si ya existe
     if (document.getElementById('loadingWordRow')) return;
-    
+
     const loadingRow = document.createElement('tr');
     loadingRow.id = 'loadingWordRow';
     loadingRow.innerHTML = `
@@ -441,15 +441,15 @@ async function loadWordDocuments() {
         setWordLoading(true);
 
         const result = await WordApi.getGeneratedFiles();
-        
+
         if (result.success) {
             allWordFiles = result.files || [];
             console.log("📄 Documentos Word generados:", allWordFiles);
-            
+
             if (allFiles.length === 0) {
                 await loadFiles();
             }
-            
+
             filteredWordFiles = [...allWordFiles];
             renderWordTable();
             updateWordStats();
@@ -470,18 +470,18 @@ function getSourcePdfInfo(wordFile) {
     // Ahora el API debería devolver SourcePdfId y SourcePdfName
     const sourcePdfId = wordFile.sourcePdfId;
     const sourcePdfName = wordFile.sourcePdfName;
-    
+
     if (sourcePdfId && sourcePdfName) {
         // Verificar si el PDF aún existe en la tabla de PDFs
         const pdfExists = pdfFilesMap[sourcePdfId] ? true : false;
-        
+
         return {
             id: sourcePdfId,
             name: sourcePdfName,
             exists: pdfExists
         };
     }
-    
+
     return {
         name: 'No disponible',
         id: null,
@@ -522,7 +522,7 @@ function renderTable() {
 
         const fileId = file.id;
         const fileName = file.originalName || (file.path ? file.path.split('/').pop() : 'Sin nombre');
-        
+
         const uploadDate = file.uploadDate ? new Date(file.uploadDate) : new Date();
         const formattedDate = uploadDate.toLocaleDateString('es-ES', {
             day: '2-digit',
@@ -613,7 +613,7 @@ function renderWordTable() {
 
         const fileId = file.id;
         const fileName = file.originalName || 'Sin nombre';
-        
+
         const uploadDate = file.uploadDate ? new Date(file.uploadDate) : new Date();
         const formattedDate = uploadDate.toLocaleDateString('es-ES', {
             day: '2-digit',
@@ -625,7 +625,7 @@ function renderWordTable() {
 
         // Obtener información del PDF origen usando la función mejorada
         const sourceInfo = getSourcePdfInfo(file);
-        
+
         let sourcePdfHtml = '';
         if (sourceInfo.id && sourceInfo.exists) {
             // El PDF existe - mostramos enlace
@@ -678,9 +678,6 @@ function renderWordTable() {
                 </td>
                 <td class="px-6 py-4">
                     <div class="flex gap-2">
-                        <button onclick="openWordModal('${fileName}', '${fileId}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Ver Word">
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
                         
                         <button onclick="downloadWordFile('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all" title="Descargar">
                             <i class="fa-solid fa-download"></i>
@@ -710,7 +707,7 @@ function renderWordTable() {
 async function generateWordFromPdf(fileId) {
     try {
         showProgressSpinner("Iniciando generación con IA...");
-        
+
         // Inicializar progreso
         updateProgress(0, "Preparando sistema...");
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -721,16 +718,16 @@ async function generateWordFromPdf(fileId) {
         if (!pdfFile) {
             throw new Error("No se encontró el PDF original");
         }
-        
+
         const pdfName = pdfFile.originalName;
         console.log("📄 Generando Word desde PDF:", pdfName);
-        
+
         updateProgress(10, "PDF encontrado, procesando...");
         await new Promise(resolve => setTimeout(resolve, 600));
 
         // 1️⃣ Generar estructura JSON (10-50%)
         updateProgress(15, "Conectando con IA...");
-        
+
         const parseStartTime = Date.now();
         const estructura = await WordApi.parsePdfWithAI(fileId);
 
@@ -741,17 +738,17 @@ async function generateWordFromPdf(fileId) {
         // Calcular progreso basado en tiempo real
         const parseElapsed = Date.now() - parseStartTime;
         let progress = Math.min(50, 15 + Math.floor(parseElapsed / 300));
-        
+
         updateProgress(progress, "Estructura analizada, preparando Word...");
         console.log("Estructura generada:", estructura.data);
         await new Promise(resolve => setTimeout(resolve, 700));
 
         // 2️⃣ Generar Word (50-95%)
         updateProgress(55, "Generando documento Word...");
-        
+
         const wordStartTime = Date.now();
         const word = await WordApi.generateFromAiStructure(
-            estructura.data, 
+            estructura.data,
             fileId,
             pdfName
         );
@@ -763,20 +760,20 @@ async function generateWordFromPdf(fileId) {
         // Calcular progreso de generación
         const wordElapsed = Date.now() - wordStartTime;
         progress = Math.min(95, 55 + Math.floor(wordElapsed / 200));
-        
+
         updateProgress(progress, "Word generado, preparando archivo...");
         await new Promise(resolve => setTimeout(resolve, 800));
-        
+
         // Finalizar (95-100%)
         updateProgress(98, "Procesando archivo final...");
         await new Promise(resolve => setTimeout(resolve, 600));
-        
+
         // Actualizar tabla de Word
         await loadWordDocuments();
-        
+
         updateProgress(100, "¡Word generado con éxito!");
         await new Promise(resolve => setTimeout(resolve, 800));
-        
+
         hideProgressSpinner();
         showToast(`Word generado: ${word.data.originalName}`, "success");
 
@@ -788,100 +785,138 @@ async function generateWordFromPdf(fileId) {
 }
 
 // ============================================
-// FUNCIÓN PARA GENERAR EXCEL DESDE WORD (CON PROGRESO REALISTA)
+// FUNCIÓN PARA GENERAR EXCEL DESDE WORD (CORREGIDA)
 // ============================================
 async function generateExcelFromWord(wordFileId, wordFileName) {
+    console.log("🚨 DEBUG WORD:", {
+        wordFileId,
+        wordFileName
+    });
     try {
         showProgressSpinner("📊 Iniciando generación de Excel...");
-        
+
         // Inicializar progreso en 0
         updateProgress(0, "Preparando entorno...");
-        
+
         // Pequeña pausa para mostrar el inicio
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
         // PASO 1: Obtener contenido temático (0-20%)
         updateProgress(5, "Conectando con el servidor...");
-        
+
         // Simular tiempo de conexión
         await new Promise(resolve => setTimeout(resolve, 800));
-        
+
         updateProgress(10, "Extrayendo contenido del Word...");
-        
+
         const startTime = Date.now();
         const contenidoTematico = await ExcelApi.getContenidoTematico(wordFileId);
-        
+
         if (!contenidoTematico) {
             throw new Error("No se pudo obtener el contenido del Word");
         }
-        
+
         // Calcular tiempo transcurrido para ajustar progreso
         const elapsedTime = Date.now() - startTime;
         let progress = Math.min(20, 10 + Math.floor(elapsedTime / 200)); // Máximo 20%
-        
+
         updateProgress(progress, "Contenido extraído correctamente");
         await new Promise(resolve => setTimeout(resolve, 600));
-        
+
         // PASO 2: Generar reactivos (20-60%)
         updateProgress(25, "📋 Generando reactivos con IA...");
-        
+
         const reactivosStartTime = Date.now();
         const reactivosResult = await ExcelApi.generateExcelReactivos(contenidoTematico);
-        
+
         // Calcular progreso basado en tiempo real (20-60%)
         const reactivosElapsed = Date.now() - reactivosStartTime;
         progress = Math.min(60, 25 + Math.floor(reactivosElapsed / 300)); // Máximo 60%
-        
+
         updateProgress(progress, "Reactivos generados, organizando...");
         await new Promise(resolve => setTimeout(resolve, 700));
-        
+
         // PASO 3: Preparar datos para Excel (60-75%)
         updateProgress(65, "Procesando datos...");
-        
+
         // Pequeña pausa para procesamiento
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         let datosParaExcel = reactivosResult;
         if (reactivosResult.materias) datosParaExcel = reactivosResult.materias;
         else if (reactivosResult.data) datosParaExcel = reactivosResult.data;
         else if (reactivosResult.reactivos) datosParaExcel = reactivosResult.reactivos;
-        
+
         updateProgress(75, "Datos procesados, generando Excel...");
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
         // PASO 4: Generar Excel (75-95%)
         updateProgress(80, "Creando archivo Excel...");
-        
+
         const excelStartTime = Date.now();
-        const excelResult = await ExcelApi.generateExcel(datosParaExcel);
-        
-        // Progreso basado en tiempo de generación
-        const excelElapsed = Date.now() - excelStartTime;
-        progress = Math.min(95, 80 + Math.floor(excelElapsed / 200));
-        updateProgress(progress, "Archivo Excel generado");
-        
-        if (excelResult.fileId) {
-            // PASO 5: Descarga y actualización (95-100%)
-            updateProgress(97, "✅ Excel listo, descargando...");
-            await new Promise(resolve => setTimeout(resolve, 800));
+        const excelResult = await ExcelApi.generateExcel(
+            datosParaExcel,
+            wordFileId,
+            wordFileName
+        );
+
+        console.log("📊 Resultado de generar Excel:", excelResult);
+        const fileId = excelResult.fileId || excelResult.Id || excelResult.id;
+        console.log("📊 ID del archivo generado:", fileId);
+
+        if (fileId) {
+            updateProgress(90, "Actualizando lista de archivos...");
             
-            await ExcelApi.downloadExcel(excelResult.fileId);
+            // Estrategia: intentar cargar hasta que aparezca el archivo
+            let attempts = 0;
+            const maxAttempts = 6; // 6 intentos = ~5 segundos máximo
             
-            updateProgress(99, "Actualizando lista de archivos...");
-            await new Promise(resolve => setTimeout(resolve, 600));
+            while (attempts < maxAttempts) {
+                attempts++;
+                updateProgress(90 + attempts, `Verificando archivo (intento ${attempts}/${maxAttempts})...`);
+                
+                // Cargar la lista actualizada (sin mostrar loading)
+                await loadExcelFiles(false);
+                
+                // Verificar si el archivo ya está en la lista
+                const fileExists = allExcelFiles.some(f => f.id === fileId);
+                
+                if (fileExists) {
+                    console.log(`✅ Archivo encontrado en el intento ${attempts}`);
+                    
+                    // Forzar re-renderizado de la tabla
+                    filteredExcelFiles = [...allExcelFiles];
+                    renderExcelTable();
+                    
+                    updateProgress(99, "Archivo listo en la tabla");
+                    await new Promise(resolve => setTimeout(resolve, 400));
+                    
+                    hideProgressSpinner();
+                    showToast('✅ Excel generado correctamente', 'success');
+                    return; // Salir de la función
+                }
+                
+                // Esperar antes del siguiente intento
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
             
-            await loadExcelFiles();
+            // Si llegamos aquí, no se encontró el archivo después de varios intentos
+            console.warn("⚠️ El archivo no apareció en la lista después de varios intentos");
             
-            updateProgress(100, "¡Proceso completado con éxito!");
-            await new Promise(resolve => setTimeout(resolve, 800));
+            // Aún así, cargamos la lista una última vez
+            await loadExcelFiles(true);
+            
+            updateProgress(99, "Proceso completado");
+            await new Promise(resolve => setTimeout(resolve, 500));
             
             hideProgressSpinner();
-            showToast('✅ Excel generado correctamente', 'success');
+            showToast('✅ Excel generado (puede tardar en aparecer en la lista)', 'success');
+            
         } else {
             hideProgressSpinner();
             showToast('✅ Proceso completado', 'success');
         }
-        
+
     } catch (error) {
         hideProgressSpinner();
         console.error('❌ Error:', error);
@@ -894,7 +929,7 @@ async function generateExcelFromWord(wordFileId, wordFileName) {
 // ============================================
 document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const file = fileInput.files[0];
     if (!file) {
         showErrorModal('Archivo no seleccionado', 'Por favor selecciona un archivo PDF');
@@ -903,39 +938,39 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
 
     progressContainer.classList.remove('hidden');
     showProgressSpinner("Subiendo archivo PDF...");
-    
+
     // Progreso inicial
     updateProgress(5, "Preparando archivo...");
     await new Promise(resolve => setTimeout(resolve, 500));
-    
+
     try {
         updateProgress(10, "Iniciando transferencia...");
-        
+
         // Aquí podrías implementar el progreso real de subida si tu API lo soporta
         // Por ahora usamos progreso basado en tiempo
         const uploadStartTime = Date.now();
-        
+
         const result = await PdfApi.uploadPdfFile(file);
-        
+
         // Calcular tiempo de subida
         const uploadElapsed = Date.now() - uploadStartTime;
         let progress = Math.min(90, 10 + Math.floor(uploadElapsed / 100));
-        
+
         if (result.success) {
             progressBar.style.width = '100%';
             progressPercent.textContent = '100%';
-            
+
             // Completar progreso
             progress = 95;
             updateProgress(progress, "Archivo subido, procesando...");
             await new Promise(resolve => setTimeout(resolve, 800));
-            
+
             updateProgress(98, "Actualizando lista de archivos...");
             await loadFiles();
-            
+
             updateProgress(100, "¡PDF subido correctamente!");
             await new Promise(resolve => setTimeout(resolve, 800));
-            
+
             hideProgressSpinner();
             showToast('✅ Documento subido correctamente', 'success');
             resetForm();
@@ -962,7 +997,7 @@ async function confirmDelete() {
 
     closeDeleteModal();
     showProgressSpinner("Eliminando archivo...");
-    
+
     // Progreso inicial
     updateProgress(10, "Verificando archivo...");
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -970,20 +1005,20 @@ async function confirmDelete() {
     if (pendingDeleteType === 'pdf') {
         const idToDelete = pendingDeleteId;
         console.log("Eliminando PDF:", idToDelete);
-        
+
         updateProgress(30, "Eliminando PDF...");
         const result = await PdfApi.deleteFile(idToDelete);
-        
+
         if (result.success) {
             updateProgress(70, "PDF eliminado, actualizando...");
             await new Promise(resolve => setTimeout(resolve, 600));
-            
+
             updateProgress(90, "Refrescando vista...");
             await loadFiles();
-            
+
             updateProgress(100, "¡Proceso completado!");
             await new Promise(resolve => setTimeout(resolve, 600));
-            
+
             hideProgressSpinner();
             showToast('Documento PDF eliminado correctamente', 'success');
         } else {
@@ -992,20 +1027,20 @@ async function confirmDelete() {
         }
     } else if (pendingDeleteType === 'word') {
         console.log("Eliminando Word generado:", pendingDeleteId);
-        
+
         updateProgress(30, "Eliminando Word...");
         const result = await WordApi.deleteGeneratedFile(pendingDeleteId);
-        
+
         if (result.success) {
             updateProgress(70, "Word eliminado, actualizando...");
             await new Promise(resolve => setTimeout(resolve, 600));
-            
+
             updateProgress(90, "Refrescando vista...");
             await loadWordDocuments();
-            
+
             updateProgress(100, "¡Proceso completado!");
             await new Promise(resolve => setTimeout(resolve, 600));
-            
+
             hideProgressSpinner();
             showToast('Documento Word eliminado correctamente', 'success');
         } else {
@@ -1014,22 +1049,22 @@ async function confirmDelete() {
         }
     } else if (pendingDeleteType === 'excel') {
         console.log("Eliminando Excel generado:", pendingDeleteId);
-        
+
         updateProgress(30, "Eliminando Excel...");
-        
+
         try {
             const result = await ExcelApi.deleteGeneratedExcel(pendingDeleteId);
-            
+
             if (result) {
                 updateProgress(70, "Excel eliminado, actualizando...");
                 await new Promise(resolve => setTimeout(resolve, 600));
-                
+
                 updateProgress(90, "Refrescando vista...");
-                await loadExcelFiles();
-                
+                await loadExcelFiles(true);
+
                 updateProgress(100, "¡Proceso completado!");
                 await new Promise(resolve => setTimeout(resolve, 600));
-                
+
                 hideProgressSpinner();
                 showToast('Documento Excel eliminado correctamente', 'success');
             } else {
@@ -1041,7 +1076,7 @@ async function confirmDelete() {
             showErrorModal('Error al eliminar Excel', error.message);
         }
     }
-    
+
     deleteBtn.innerHTML = originalText;
     deleteBtn.disabled = false;
 }
@@ -1075,14 +1110,46 @@ function updateExcelStats() {
 // ============================================
 // DESCARGAR ARCHIVO PDF
 // ============================================
+// ============================================
+// DESCARGAR ARCHIVO PDF (VERSIÓN CON FETCH)
+// ============================================
 async function downloadFile(id, fileName) {
     try {
-        const result = await PdfApi.downloadFileById(id);
-        if (!result.success) {
-            showErrorModal('Error al descargar', result.error);
+        showToast(`Descargando ${fileName}...`, 'success');
+        
+        console.log("Descargando - ID:", id);
+        console.log("Descargando - Nombre:", fileName);
+        
+        // Hacer fetch exactamente como lo hace el visor
+        const response = await fetch(`http://localhost:5074/api/pdf-files/${id}`);
+        
+        if (!response.ok) {
+            throw new Error('Error al descargar');
         }
+        
+        // Obtener el blob
+        const blob = await response.blob();
+        
+        // Crear URL del blob
+        const blobUrl = window.URL.createObjectURL(blob);
+        
+        // Crear enlace temporal
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName; // Forzar el nombre
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        // Limpiar
+        setTimeout(() => {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        }, 100);
+        
     } catch (error) {
         showErrorModal('Error de conexión', 'No se pudo conectar con el servidor');
+        console.error(error);
     }
 }
 
@@ -1091,10 +1158,10 @@ async function downloadFile(id, fileName) {
 // ============================================
 function downloadWordFile(fileId, fileName) {
     showToast(`Descargando ${fileName}...`, 'success');
-    
+
     // Construir URL de descarga para archivos Word generados
     const downloadUrl = `${WordApi.baseUrl}/word-files/generated/${fileId}`;
-    
+
     // Crear un enlace temporal para descargar
     const link = document.createElement('a');
     link.href = downloadUrl;
@@ -1110,7 +1177,10 @@ function downloadWordFile(fileId, fileName) {
 async function downloadExcelFile(fileId, fileName) {
     try {
         showToast(`Descargando ${fileName}...`, 'success');
-        await ExcelApi.downloadExcel(fileId);
+
+        // 🔥 PASAS EL NOMBRE REAL DEL EXCEL
+        await ExcelApi.downloadExcel(fileId, fileName);
+
     } catch (error) {
         showErrorModal('Error al descargar', error.message);
     }
@@ -1119,14 +1189,14 @@ async function downloadExcelFile(fileId, fileName) {
 // ============================================
 // BÚSQUEDA EN TIEMPO REAL (PDF)
 // ============================================
-document.getElementById('searchInput').addEventListener('input', function(e) {
+document.getElementById('searchInput').addEventListener('input', function (e) {
     const searchTerm = e.target.value.toLowerCase();
-    
+
     filteredFiles = allFiles.filter(file => {
         const fileName = (file.originalName || file.path || '').toLowerCase();
         return fileName.includes(searchTerm) || (file.id && file.id.includes(searchTerm));
     });
-    
+
     currentPage = 1;
     renderTable();
 });
@@ -1134,18 +1204,18 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
 // ============================================
 // BÚSQUEDA EN TIEMPO REAL (WORD)
 // ============================================
-document.getElementById('searchWordInput').addEventListener('input', function(e) {
+document.getElementById('searchWordInput').addEventListener('input', function (e) {
     const searchTerm = e.target.value.toLowerCase();
-    
+
     filteredWordFiles = allWordFiles.filter(file => {
         const fileName = (file.originalName || '').toLowerCase();
         const sourceName = (file.sourcePdfName || '').toLowerCase();
-        
-        return fileName.includes(searchTerm) || 
-               sourceName.includes(searchTerm) || 
-               (file.id && file.id.includes(searchTerm));
+
+        return fileName.includes(searchTerm) ||
+            sourceName.includes(searchTerm) ||
+            (file.id && file.id.includes(searchTerm));
     });
-    
+
     currentWordPage = 1;
     renderWordTable();
 });
@@ -1153,16 +1223,16 @@ document.getElementById('searchWordInput').addEventListener('input', function(e)
 // ============================================
 // BÚSQUEDA EN TIEMPO REAL EXCEL
 // ============================================
-document.getElementById('searchExcelInput')?.addEventListener('input', function(e) {
+document.getElementById('searchExcelInput')?.addEventListener('input', function (e) {
     const searchTerm = e.target.value.toLowerCase();
-    
+
     filteredExcelFiles = allExcelFiles.filter(file => {
         const fileName = (file.originalName || '').toLowerCase();
         const wordOrigen = (file.sourceWordName || file.sourceFileName || '').toLowerCase();
-        
+
         return fileName.includes(searchTerm) || wordOrigen.includes(searchTerm);
     });
-    
+
     currentExcelPage = 1;
     renderExcelTable();
 });
@@ -1174,10 +1244,10 @@ function updatePagination() {
     const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
     const paginationInfo = document.getElementById('paginationInfo');
     const paginationControls = document.getElementById('paginationControls');
-    
+
     const start = (currentPage - 1) * itemsPerPage + 1;
     const end = Math.min(currentPage * itemsPerPage, filteredFiles.length);
-    
+
     paginationInfo.innerHTML = `
         <i class="fa-regular fa-file-pdf mr-2"></i>
         Mostrando ${filteredFiles.length > 0 ? start : 0}-${end} de ${filteredFiles.length} resultados
@@ -1189,7 +1259,7 @@ function updatePagination() {
     }
 
     let controls = '';
-    
+
     controls += `
         <button onclick="changePage(${currentPage - 1})" 
             ${currentPage === 1 ? 'disabled' : ''}
@@ -1229,10 +1299,10 @@ function updateWordPagination() {
     const totalPages = Math.ceil(filteredWordFiles.length / itemsPerPage);
     const paginationInfo = document.getElementById('wordPaginationInfo');
     const paginationControls = document.getElementById('wordPaginationControls');
-    
+
     const start = (currentWordPage - 1) * itemsPerPage + 1;
     const end = Math.min(currentWordPage * itemsPerPage, filteredWordFiles.length);
-    
+
     paginationInfo.innerHTML = `
         <i class="fa-regular fa-file-word mr-2 text-blue-500"></i>
         Mostrando ${filteredWordFiles.length > 0 ? start : 0}-${end} de ${filteredWordFiles.length} resultados
@@ -1244,7 +1314,7 @@ function updateWordPagination() {
     }
 
     let controls = '';
-    
+
     controls += `
         <button onclick="changeWordPage(${currentWordPage - 1})" 
             ${currentWordPage === 1 ? 'disabled' : ''}
@@ -1284,12 +1354,12 @@ function updateExcelPagination() {
     const totalPages = Math.ceil(filteredExcelFiles.length / itemsPerPageExcel);
     const paginationInfo = document.getElementById('excelPaginationInfo');
     const paginationControls = document.getElementById('excelPaginationControls');
-    
+
     if (!paginationInfo || !paginationControls) return;
-    
+
     const start = (currentExcelPage - 1) * itemsPerPageExcel + 1;
     const end = Math.min(currentExcelPage * itemsPerPageExcel, filteredExcelFiles.length);
-    
+
     paginationInfo.innerHTML = `
         <i class="fa-regular fa-file-excel mr-2 text-green-500"></i>
         Mostrando ${filteredExcelFiles.length > 0 ? start : 0}-${end} de ${filteredExcelFiles.length} resultados
@@ -1301,7 +1371,7 @@ function updateExcelPagination() {
     }
 
     let controls = '';
-    
+
     controls += `
         <button onclick="changeExcelPage(${currentExcelPage - 1})" 
             ${currentExcelPage === 1 ? 'disabled' : ''}
@@ -1359,57 +1429,64 @@ function changeExcelPage(page) {
 }
 
 // ============================================
-// FUNCIONES PARA EXCEL
+// FUNCIONES PARA EXCEL - CORREGIDAS
 // ============================================
 
 // CARGAR ARCHIVOS EXCEL DESDE API
-async function loadExcelFiles() {
+async function loadExcelFiles(showLoading = true) {
     try {
-        // Solo mostrar spinner si no hay datos cargados previamente
-        if (allExcelFiles.length === 0) {
-            showProgressSpinner("Cargando archivos Excel...");
-        }
-        
         const tbody = document.getElementById('excelFilesTableBody');
-        tbody.innerHTML = `
-            <tr id="loadingExcelRow">
-                <td colspan="5" class="px-6 py-8 text-center">
-                    <div class="flex flex-col items-center justify-center">
-                        <i class="fa-solid fa-spinner fa-spin text-green-600 text-3xl mb-3"></i>
-                        <p class="text-gray-500">Cargando archivos Excel...</p>
-                    </div>
-                </td>
-            </tr>
-        `;
+        
+        // Solo mostrar loading si se solicita explícitamente
+        if (showLoading) {
+            tbody.innerHTML = `
+                <tr id="loadingExcelRow">
+                    <td colspan="5" class="px-6 py-8 text-center">
+                        <div class="flex flex-col items-center justify-center">
+                            <i class="fa-solid fa-spinner fa-spin text-green-600 text-3xl mb-3"></i>
+                            <p class="text-gray-500">Cargando archivos Excel...</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
 
         const result = await ExcelApi.getAllGeneratedExcel();
-        
+
         if (result) {
             allExcelFiles = result || [];
             console.log("📊 Archivos Excel generados:", allExcelFiles);
+
+            // Aplicar filtro de búsqueda si existe
+            const searchTerm = document.getElementById('searchExcelInput')?.value.toLowerCase() || '';
+            if (searchTerm) {
+                filteredExcelFiles = allExcelFiles.filter(file => {
+                    const fileName = (file.originalName || '').toLowerCase();
+                    const wordOrigen = (file.sourceWordName || file.sourceFileName || '').toLowerCase();
+                    return fileName.includes(searchTerm) || wordOrigen.includes(searchTerm);
+                });
+            } else {
+                filteredExcelFiles = [...allExcelFiles];
+            }
             
-            filteredExcelFiles = [...allExcelFiles];
             renderExcelTable();
             updateExcelStats();
-            
-            if (allExcelFiles.length === 0) {
-                hideProgressSpinner();
-            }
         }
     } catch (error) {
-        hideProgressSpinner();
         console.error('Error cargando Excel:', error);
-        document.getElementById('excelFilesTableBody').innerHTML = `
-            <tr>
-                <td colspan="5" class="px-6 py-12 text-center">
-                    <div class="flex flex-col items-center">
-                        <i class="fa-solid fa-file-excel text-gray-300 text-5xl mb-4"></i>
-                        <p class="text-gray-500 text-lg">Error al cargar archivos Excel</p>
-                        <p class="text-gray-400 text-sm mt-1">${error.message}</p>
-                    </div>
-                </td>
-            </tr>
-        `;
+        if (showLoading) {
+            document.getElementById('excelFilesTableBody').innerHTML = `
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center">
+                        <div class="flex flex-col items-center">
+                            <i class="fa-solid fa-file-excel text-gray-300 text-5xl mb-4"></i>
+                            <p class="text-gray-500 text-lg">Error al cargar archivos Excel</p>
+                            <p class="text-gray-400 text-sm mt-1">${error.message}</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
     }
 }
 
@@ -1441,7 +1518,7 @@ function renderExcelTable() {
 
         const fileId = file.id;
         const fileName = file.originalName || 'Sin nombre';
-        
+
         const uploadDate = file.uploadDate ? new Date(file.uploadDate) : new Date();
         const formattedDate = uploadDate.toLocaleDateString('es-ES', {
             day: '2-digit',
@@ -1473,9 +1550,7 @@ function renderExcelTable() {
                 </td>
                 <td class="px-6 py-4">
                     <div class="flex gap-2">
-                        <button onclick="verExcel('${fileId}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Ver Excel">
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
+                       
                         <button onclick="downloadExcelFile('${fileId}', '${fileName}')" class="w-9 h-9 rounded-xl text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all" title="Descargar">
                             <i class="fa-solid fa-download"></i>
                         </button>
@@ -1491,7 +1566,6 @@ function renderExcelTable() {
     tbody.innerHTML = html;
     updateExcelPagination();
     updateExcelStats();
-    hideProgressSpinner(); // Ocultar spinner cuando termina de renderizar
 }
 
 // FUNCIONES DE ACCIONES PARA EXCEL
@@ -1501,7 +1575,7 @@ function verExcel(fileId) {
 
 // REFRESCAR TABLA EXCEL
 function refreshExcelTable() {
-    loadExcelFiles();
+    loadExcelFiles(true);
 }
 
 // ============================================
@@ -1597,7 +1671,7 @@ window.addEventListener('click', (e) => {
     const errorModal = document.getElementById('errorModal');
     const pdfModal = document.getElementById('pdfModal');
     const wordModal = document.getElementById('wordModal');
-    
+
     if (e.target === deleteModal) {
         closeDeleteModal();
     }

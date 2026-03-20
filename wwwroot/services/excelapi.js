@@ -76,12 +76,12 @@ window.ExcelApi = {
     ////////////////////////////////////////////////////////
     // 🔹 GENERAR ARCHIVO EXCEL FINAL
     ////////////////////////////////////////////////////////
-    async generateExcel(materias) {
+    async generateExcel(materias, wordId, wordName) {
 
         try {
 
             const response = await fetch(
-                `${API_BASE_URL}/generate-excel`,
+                `${API_BASE_URL}/generate-excel?sourceWordId=${wordId}&sourceWordName=${encodeURIComponent(wordName)}`,
                 {
                     method: "POST",
                     headers: {
@@ -107,44 +107,26 @@ window.ExcelApi = {
 
         }
     },
-
     ////////////////////////////////////////////////////////
     // 🔹 DESCARGAR EXCEL
     ////////////////////////////////////////////////////////
-    async downloadExcel(fileId) {
+    async downloadExcel(fileId, fileName) {
 
-        try {
+    const response = await fetch(`${API_BASE_URL}/excel/${fileId}`);
 
-            const response = await fetch(
-                `${API_BASE_URL}/excel/${fileId}`,
-                {
-                    method: "GET"
-                }
-            )
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
 
-            if (!response.ok) {
-                throw new Error(`Error HTTP: ${response.status}`)
-            }
+    const a = document.createElement("a");
+    a.href = url;
 
-            const blob = await response.blob()
+    // 🔥 NOMBRE REAL DEL EXCEL
+    a.download = fileName || `${fileId}.xlsx`;
 
-            const url = window.URL.createObjectURL(blob)
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 
-            const a = document.createElement("a")
-            a.href = url
-            a.download = `${fileId}.xlsx`
-
-            document.body.appendChild(a)
-            a.click()
-
-            a.remove()
-
-        } catch (error) {
-
-            console.error("Error descargando Excel:", error)
-            throw error
-
-        }
     },
 
     ////////////////////////////////////////////////////////
@@ -211,40 +193,8 @@ window.ExcelApi = {
         }
     },
 
-    ////////////////////////////////////////////////////////
-    // 🔹 GENERAR EXCEL POR MATERIAS Y TEMAS
-    ////////////////////////////////////////////////////////
-    async generateExcelByTopics(data) {
 
-        try {
 
-            const response = await fetch(
-                `${API_BASE_URL}/generate-by-topics`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "*/*"
-                    },
-                    body: JSON.stringify(data)
-                }
-            )
-
-            if (!response.ok) {
-                throw new Error(`Error HTTP: ${response.status}`)
-            }
-
-            const result = await response.json()
-
-            return result
-
-        } catch (error) {
-
-            console.error("Error generando Excel por temas:", error)
-            throw error
-
-        }
-    }
 }
 
 

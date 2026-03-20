@@ -117,49 +117,48 @@ const PdfApi = {
         }
     },
 
-    // ===============================
-    // DESCARGAR ARCHIVO POR ID
-    // ===============================
-    async downloadFileById(id) {
+   // ===============================
+// DESCARGAR ARCHIVO POR ID (CORREGIDO)
+// ===============================
+async downloadFileById(id, fileName) {
+    try {
+        const response = await fetch(`${this.baseUrl}/pdf-files/${id}`);
 
-        try {
-
-            const response = await fetch(`${this.baseUrl}/pdf-files/${id}`);
-
-            if (!response.ok) {
-                throw new Error(`Error HTTP: ${response.status}`);
-            }
-
-            const blob = await response.blob();
-
-            const url = window.URL.createObjectURL(blob);
-
-            const a = document.createElement('a');
-
-            a.href = url;
-            a.download = `archivo-${id}.pdf`;
-
-            document.body.appendChild(a);
-
-            a.click();
-
-            a.remove();
-
-            return {
-                success: true
-            };
-
-        } catch (error) {
-
-            console.error('Error al descargar archivo:', error);
-
-            return {
-                success: false,
-                error: error.message
-            };
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
         }
-    },
-};
+
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        
+        // FORZAR el nombre que viene de la tabla
+        // Si fileName existe, usarlo, si no, usar un nombre por defecto
+        const nombreFinal = fileName || `documento-${id}.pdf`;
+        
+        console.log("📥 Descargando con nombre:", nombreFinal); // Para depurar
+        
+        a.download = nombreFinal;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
+
+        return {
+            success: true
+        };
+
+    } catch (error) {
+        console.error('Error al descargar archivo:', error);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+}
+}
 
 
     window.PdfApi = PdfApi;
