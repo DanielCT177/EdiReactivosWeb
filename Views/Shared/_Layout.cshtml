@@ -13,23 +13,61 @@
     <!-- Tailwind CSS y Font Awesome -->
     <link href="~/css/site.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Cargar el sistema de roles -->
+    <script type="import" src="/js/roles/index.js"></script>
 </head>
 <body class="bg-gray-100">
 
-    <!-- Script de verificación de autenticación -->
-    <script>
+    <!-- Script de verificación de autenticación y ROUTE GUARD -->
+    <script type="module">
+        import { isAuthenticated, routeGuard, redirectBasedOnRole, logout } from '/js/roles/guards.js';
+        
+        // Hacer logout disponible globalmente
+        window.logout = logout;
+        
         (function() {
             const token = localStorage.getItem('token');
             const currentPath = window.location.pathname.toLowerCase();
             
+            console.log('🔍 Verificando:', { token, currentPath });
+            
+            // Verificar autenticación
             if (!token && !currentPath.includes('/auth/login')) {
+                console.log('➡️ No autenticado, redirigiendo a login');
                 window.location.href = '/Auth/Login';
+                return;
             }
             
+            // Si está en login pero ya tiene token, redirigir según rol
             if (token && currentPath.includes('/auth/login')) {
-                window.location.href = '/Dashboard/Index';
+                console.log('➡️ Ya autenticado en login, redirigiendo según rol');
+                redirectBasedOnRole(); // ✅ USA roleRedirects
+                return;
+            }
+            
+            // Ejecutar routeGuard para verificar acceso a la ruta actual
+            if (token && !currentPath.includes('/auth/login')) {
+                console.log('➡️ Verificando acceso a ruta:', currentPath);
+                routeGuard(); // ✅ USA isRouteAllowed
             }
         })();
+    </script>
+
+    <!-- Script de respaldo por si el módulo falla -->
+    <script>
+        setTimeout(function() {
+            if (typeof window.logout !== 'function') {
+                window.logout = function() {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('usuario');
+                    localStorage.removeItem('correo');
+                    localStorage.removeItem('role');
+                    sessionStorage.clear();
+                    window.location.href = '/Auth/Login';
+                };
+            }
+        }, 1000);
     </script>
 
     @if (!isLoginPage)

@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
+        /* Tus estilos existentes - se mantienen igual */
         * {
             margin: 0;
             padding: 0;
@@ -448,67 +449,85 @@
         // Inicializar partículas
         createParticles();
 
-        // Script de login
+        // Script de login usando routes.js
         import('/services/authapi.js').then(module => {
             const { login } = module;
             
-            const loginForm = document.getElementById('loginForm');
-            const loginButton = document.getElementById('loginButton');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const errorMessage = document.getElementById('errorMessage');
-            const errorText = document.getElementById('errorText');
-            
-            function showError(message) {
-                errorText.textContent = message;
-                errorMessage.classList.remove('hidden');
-                setTimeout(() => {
+            // Importar routes.js para usar roleRedirects
+            import('/js/roles/routes.js').then(routesModule => {
+                const { roleRedirects } = routesModule;
+                
+                const loginForm = document.getElementById('loginForm');
+                const loginButton = document.getElementById('loginButton');
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                const errorMessage = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                
+                function showError(message) {
+                    errorText.textContent = message;
+                    errorMessage.classList.remove('hidden');
+                    setTimeout(() => {
+                        errorMessage.classList.add('hidden');
+                    }, 5000);
+                }
+                
+                function setLoading(isLoading) {
+                    if (isLoading) {
+                        loginButton.disabled = true;
+                        loginButton.classList.add('opacity-50', 'cursor-not-allowed');
+                        loadingSpinner.classList.remove('hidden');
+                    } else {
+                        loginButton.disabled = false;
+                        loginButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                        loadingSpinner.classList.add('hidden');
+                    }
+                }
+                
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
                     errorMessage.classList.add('hidden');
-                }, 5000);
-            }
-            
-            function setLoading(isLoading) {
-                if (isLoading) {
-                    loginButton.disabled = true;
-                    loginButton.classList.add('opacity-50', 'cursor-not-allowed');
-                    loadingSpinner.classList.remove('hidden');
-                } else {
-                    loginButton.disabled = false;
-                    loginButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                    loadingSpinner.classList.add('hidden');
+                    
+                    const identificador = document.getElementById('identificador').value;
+                    const clave = document.getElementById('clave').value;
+                    
+                    if (!identificador || !clave) {
+                        showError('Por favor completa todos los campos');
+                        return;
+                    }
+                    
+                    try {
+                        setLoading(true);
+                        const result = await login(identificador, clave);
+                        console.log('Login exitoso:', result);
+                        
+                        // Obtener el rol del usuario
+                        const rol = result.usuario?.rol || localStorage.getItem('role');
+                        
+                        // Usar roleRedirects de routes.js para redirigir
+                        const destino = roleRedirects[rol] || '/Dashboard/Index';
+                        console.log('Redirigiendo a:', destino, 'para rol:', rol);
+                        window.location.href = destino;
+                        
+                    } catch (error) {
+                        console.error('Error en login:', error);
+                        showError(error.message || 'Error al conectar con el servidor');
+                    } finally {
+                        setLoading(false);
+                    }
+                });
+                
+                // Si ya hay sesión, redirigir usando roleRedirects
+                if (localStorage.getItem('token')) {
+                    const rol = localStorage.getItem('role');
+                    const destino = roleRedirects[rol] || '/Dashboard/Index';
+                    window.location.href = destino;
                 }
-            }
-            
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                errorMessage.classList.add('hidden');
-                
-                const identificador = document.getElementById('identificador').value;
-                const clave = document.getElementById('clave').value;
-                
-                if (!identificador || !clave) {
-                    showError('Por favor completa todos los campos');
-                    return;
-                }
-                
-                try {
-                    setLoading(true);
-                    const result = await login(identificador, clave);
-                    console.log('Login exitoso:', result);
-                    window.location.href = '/Dashboard/Index';
-                } catch (error) {
-                    console.error('Error en login:', error);
-                    showError(error.message || 'Error al conectar con el servidor');
-                } finally {
-                    setLoading(false);
-                }
+            }).catch(err => {
+                console.error('Error al cargar routes.js:', err);
             });
-            
-            if (localStorage.getItem('token')) {
-                window.location.href = '/Dashboard/Index';
-            }
         }).catch(err => {
-            console.error('Error al cargar el módulo de autenticación:', err);
+            console.error('Error al cargar authapi.js:', err);
         });
     </script>
 </body>

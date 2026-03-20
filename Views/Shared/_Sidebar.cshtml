@@ -14,24 +14,12 @@
         </div>
     </div>
 
-    <!-- Menú de navegación -->
-    <nav class="px-4 py-6">
-        <a href="/Dashboard/Index" 
-           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all mb-2 @(currentController == "Dashboard" ? "bg-white/20" : "hover:bg-white/10")">
-            <i class="fa-solid fa-chart-pie w-5"></i>
-            <span class="font-medium">Dashboard</span>
-        </a>
-        
-        <a href="/Guia/Index" 
-           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all mb-2 @(currentController == "Guia" ? "bg-white/20" : "hover:bg-white/10")">
-            <i class="fa-solid fa-file-pdf w-5"></i>
-            <span class="font-medium">Guías PDF</span>
-        </a>
-       <a href="/Reactivos/Index" 
-           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all mb-2 @(currentController == "Reactivos" ? "bg-white/20" : "hover:bg-white/10")">
-            <i class="fa-solid fa-flask w-5"></i>
-            <span class="font-medium">Generar Reactivos</span>
-        </a>
+    <!-- Menú de navegación - Se genera dinámicamente -->
+    <nav class="px-4 py-6" id="menuContainer">
+        <!-- Los menús se cargarán aquí desde la configuración -->
+        <div class="text-center text-white/50 py-4">
+            <i class="fa-solid fa-spinner fa-spin"></i> Cargando menú...
+        </div>
     </nav>
 
     <!-- Usuario dinámico -->
@@ -42,8 +30,7 @@
             </div>
             <div class="flex-1" id="userInfoContainer">
                 <p class="text-sm font-medium" id="userNameDisplay">Cargando...</p>
-                <p class="text-xs text-white/50" id="userEmailDisplay"></p>
-                <span class="text-xs bg-blue-600 px-2 py-0.5 rounded-full mt-1 inline-block" id="userRoleDisplay"></span>
+                <span class="text-xs px-2 py-0.5 rounded-full mt-1 inline-block" id="userRoleDisplay"></span>
             </div>
         </div>
         
@@ -56,23 +43,54 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    // Importar la configuración de roles
+    import { getModulosPorRol, roleColors } from '/js/roles/roleConfig.js';
+    
     function loadUserData() {
         try {
             const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-            const correo = localStorage.getItem('correo') || '';
-            const rol = localStorage.getItem('cardibot_role') || '';
+            let rol = localStorage.getItem('role') || usuario.rol || '';
             
-            document.getElementById('userNameDisplay').textContent = usuario.nombreCompleto || 'Usuario';
-            document.getElementById('userEmailDisplay').textContent = correo || 'correo@ejemplo.com';
+            // Guardar rol si no existe
+            if (!localStorage.getItem('role') && usuario.rol) {
+                localStorage.setItem('role', usuario.rol);
+                rol = usuario.rol;
+            }
             
+            // Actualizar nombre de usuario
+            document.getElementById('userNameDisplay').textContent = usuario.nombreCompleto || usuario.nombre || 'Usuario';
+            
+            // Actualizar rol en el badge con color
             const roleDisplay = document.getElementById('userRoleDisplay');
             if (rol) {
                 roleDisplay.textContent = rol;
+                roleDisplay.className = `text-xs ${roleColors[rol] || 'bg-blue-600'} px-2 py-0.5 rounded-full mt-1 inline-block`;
                 roleDisplay.style.display = 'inline-block';
             } else {
                 roleDisplay.style.display = 'none';
             }
+
+            // GENERAR MENÚ DINÁMICAMENTE DESDE LA CONFIGURACIÓN
+            const modulosPermitidos = getModulosPorRol(rol);
+            const currentController = '@currentController';
+            
+            let menuHTML = '';
+            modulosPermitidos.forEach(modulo => {
+                const isActive = currentController === modulo.href.split('/')[1];
+                menuHTML += `
+                    <a href="${modulo.href}" 
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all mb-2 ${isActive ? 'bg-white/20' : 'hover:bg-white/10'}">
+                        <i class="fa-solid ${modulo.icon} w-5"></i>
+                        <span class="font-medium">${modulo.text}</span>
+                    </a>
+                `;
+            });
+            
+            document.getElementById('menuContainer').innerHTML = menuHTML;
+            
+            console.log('Menú generado para rol:', rol, 'Módulos:', modulosPermitidos);
+
         } catch (error) {
             console.error('Error cargando datos:', error);
         }
@@ -82,7 +100,7 @@
         localStorage.removeItem('token');
         localStorage.removeItem('usuario');
         localStorage.removeItem('correo');
-        localStorage.removeItem('cardibot_role');
+        localStorage.removeItem('role');
         sessionStorage.clear();
         window.location.href = '/Auth/Login';
     };
