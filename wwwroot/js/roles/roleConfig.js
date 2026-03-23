@@ -13,7 +13,7 @@ export const Roles = {
 export const rolePermissions = {
     // Dashboard - ¿Quiénes pueden verlo?
     dashboard: {
-        allowedRoles: [Roles.ADMINISTRADOR, Roles.COORDINADOR], // Solo Admin y Coordinador
+        allowedRoles: [Roles.COORDINADOR], // Solo Admin y Coordinador
         // allowedRoles: [Roles.ADMINISTRADOR], // Solo Admin
         // allowedRoles: [Roles.ADMINISTRADOR, Roles.DOCENTE, Roles.COORDINADOR], // Todos menos Estudiante
         icon: 'fa-chart-pie',

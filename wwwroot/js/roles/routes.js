@@ -11,7 +11,7 @@ export const publicRoutes = [
 // Rutas protegidas por rol
 export const protectedRoutes = {
     // Dashboard - solo Admin y Coordinador
-    '/Dashboard': [Roles.ADMINISTRADOR, Roles.COORDINADOR],
+    '/Dashboard': [ Roles.COORDINADOR],
     
     // Guías - TODOS los roles
     '/Guia': [Roles.ADMINISTRADOR, Roles.DOCENTE, Roles.COORDINADOR, Roles.SOPORTE, Roles.ALUMNO],
@@ -22,17 +22,17 @@ export const protectedRoutes = {
 
 // REDIRECCIONES POR ROL
 export const roleRedirects = {
-    [Roles.ADMINISTRADOR]: '/Dashboard/Index',
-    [Roles.DOCENTE]: '/Dashboard/Index',
+    [Roles.ADMINISTRADOR]: '/Guia/Index',
+    [Roles.DOCENTE]: '/Guia/Index',
     [Roles.ALUMNO]: '/Guia/Index',
-    [Roles.COORDINADOR]: '/Dashboard/Index',
-    [Roles.SOPORTE]: '/Dashboard/Index'
+    [Roles.COORDINADOR]: '/Guia/Index',
+    [Roles.SOPORTE]: '/Guia/Index'
 };
 
 export function isRouteAllowed(rol, ruta) {
     // Normalizar ruta (minúsculas para comparar)
     const rutaLower = ruta.toLowerCase();
-    
+    console.log("ROLES PERMITIDOS:", allowedRoles); // ❌
     // Verificar rutas públicas
     if (publicRoutes.some(r => rutaLower.startsWith(r.toLowerCase()))) {
         return true;

@@ -96,13 +96,12 @@
         }
     }
 
-    window.logout = function() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('usuario');
-        localStorage.removeItem('correo');
-        localStorage.removeItem('role');
+      window.logout = function() {
+        localStorage.clear();
         sessionStorage.clear();
-        window.location.href = '/Auth/Login';
+
+        // 🔥 Evita regresar con botón atrás
+        window.location.replace('/Auth/Login');
     };
 
     document.addEventListener('DOMContentLoaded', loadUserData);

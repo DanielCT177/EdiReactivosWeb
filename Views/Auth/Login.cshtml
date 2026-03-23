@@ -505,7 +505,7 @@
                         const rol = result.usuario?.rol || localStorage.getItem('role');
                         
                         // Usar roleRedirects de routes.js para redirigir
-                        const destino = roleRedirects[rol] || '/Dashboard/Index';
+                        const destino = roleRedirects[rol];
                         console.log('Redirigiendo a:', destino, 'para rol:', rol);
                         window.location.href = destino;
                         
@@ -518,11 +518,12 @@
                 });
                 
                 // Si ya hay sesión, redirigir usando roleRedirects
-                if (localStorage.getItem('token')) {
-                    const rol = localStorage.getItem('role');
-                    const destino = roleRedirects[rol] || '/Dashboard/Index';
-                    window.location.href = destino;
-                }
+                      const token = localStorage.getItem('token');
+        const rol = localStorage.getItem('role');
+
+        if (token && rol && roleRedirects[rol]) {
+            window.location.replace(roleRedirects[rol]);
+        }
             }).catch(err => {
                 console.error('Error al cargar routes.js:', err);
             });
