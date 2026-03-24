@@ -498,7 +498,23 @@
                     
                     try {
                         setLoading(true);
-                        const result = await login(identificador, clave);
+                                const result = await login(identificador, clave);
+
+        // 🔥 guardar rol en frontend
+        localStorage.setItem("role", result.usuario.rol);
+
+        // 🔥 enviar a .NET
+        await fetch('/Auth/LoginBackend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nombre: result.usuario.nombre,
+                email: result.usuario.email,
+                rol: result.usuario.rol
+            })
+        });
                         console.log('Login exitoso:', result);
                         
                         // Obtener el rol del usuario

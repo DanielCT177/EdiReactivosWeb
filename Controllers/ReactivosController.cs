@@ -1,13 +1,14 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EdiReactivosWeb.Controllers
 {
     public class ReactivosController : Controller
     {
-        // GET: /Reactivos/Index
+        [Authorize(Roles = "Administrador")]
         public IActionResult Index()
         {
-            return View(); // Esto busca Index.cshtml
+            return View(); 
         }
     }
 }
